@@ -5,8 +5,10 @@
   "author": "Makoto Hirose <makolllmako@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/query-string": "^6.3.0",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.8.5",
+    "@types/react-router-dom": "^4.3.4",
     "@types/webpack": "^4.32.1",
     "@types/webpack-dev-server": "^3.1.7",
     "awesome-typescript-loader": "^5.2.1",
@@ -17,9 +19,11 @@
     "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
+    "query-string": "^6.8.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-google-charts": "^3.0.14"
+    "react-google-charts": "^3.0.14",
+    "react-router-dom": "^5.0.1"
   },
   "scripts": {
     "start": "yarn webpack-dev-server --mode development"

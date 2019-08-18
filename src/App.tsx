@@ -1,21 +1,40 @@
 import * as React from "react";
+import { BrowserRouter, Route } from "react-router-dom";
+import * as queryString from "query-string";
+import * as H from "history";
 import Chart from "react-google-charts";
 import countries from "./countries";
 
-interface OuterProps {}
+const App = () => (
+  <BrowserRouter>
+    <div>
+      <Route exact path="/" component={Map} />
+    </div>
+  </BrowserRouter>
+);
+
+interface OuterProps {
+  location: H.Location;
+}
 interface AppState {
   region: string;
   resolution: string;
   data: Array<any>;
 }
 
-class App extends React.Component<OuterProps, AppState> {
-  state: AppState = {
-    region: "world",
-    resolution: "",
-    data: countries
-  };
-
+class Map extends React.Component<OuterProps, AppState> {
+  constructor(props: OuterProps) {
+    super(props);
+    console.log(queryString.parse(this.props.location.search));
+    const paramsData = { JP: 1 };
+    const allData = { ...countries, ...paramsData };
+    const data = Object.entries(allData);
+    this.state = {
+      region: "world",
+      resolution: "",
+      data
+    };
+  }
   render() {
     const { data } = this.state;
 
