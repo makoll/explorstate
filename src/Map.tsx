@@ -15,7 +15,7 @@ interface AppState {
   mapParameter: string;
 }
 
-const getBlankMapObj = () => {
+const getBlankMapArray = () => {
   let mapObj = Object.keys(countries).reduce(
     (obj, countryCode) => Object.assign(obj, { [countryCode]: 0 }),
     { Region: "Data" }
@@ -26,7 +26,7 @@ const getBlankMapObj = () => {
       mapObj
     );
   }
-  return mapObj;
+  return Object.entries(mapObj);
 };
 
 interface MapSelectProps {
@@ -37,10 +37,8 @@ class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
 
-    const mapObj = this.getParamMapObj() || getBlankMapObj();
-    console.log(mapObj);
-    const mapArray = Object.entries(mapObj);
-    // const mapParameter: string = cdStr ? `?mapGetParam=${cdStr}` : "";
+    const mapArray: Array<Array<string | number>> =
+      this.getParamMapArray() || getBlankMapArray();
     const mapParameter: string = "";
     this.state = {
       region: "world",
@@ -50,7 +48,7 @@ class Map extends React.Component<OuterProps, AppState> {
     };
   }
 
-  getParamMapObj = () => {
+  getParamMapArray = () => {
     const getParams = queryString.parse(this.props.location.search);
     if (!getParams.mapGetParam) {
       return null;
@@ -59,7 +57,7 @@ class Map extends React.Component<OuterProps, AppState> {
     if (typeof cdStr !== "string") {
       cdStr = "";
     }
-    const allData: Object = JSON.parse(decode(cdStr));
+    const allData: Array<Array<string | number>> = JSON.parse(decode(cdStr));
     return allData;
   };
 
@@ -83,15 +81,21 @@ class Map extends React.Component<OuterProps, AppState> {
 
     selectedArea[1] = selectedArea[1] ? 0 : 1;
 
-    const mapObj = mapArray.reduce(
-      (obj, mapAreaData) =>
-        Object.assign(obj, { [mapAreaData[0]]: mapAreaData[1] }),
-      {}
-    );
+    const areaCode = selectedArea[0];
+    let _mapArray = mapArray;
+    if (typeof areaCode === "string") {
+      const countryCode: string = areaCode.split("-")[0];
+      _mapArray = _mapArray.map(areaData => {
+        if (areaData[0] === countryCode) {
+          return [countryCode, 1];
+        }
+        return areaData;
+      });
+    }
 
-    const mapParameter = `?mapGetParam=${encode(JSON.stringify(mapObj))}`;
+    const mapParameter = `?mapGetParam=${encode(JSON.stringify(_mapArray))}`;
     this.setState({
-      mapArray,
+      mapArray: _mapArray,
       mapParameter
     });
   };
