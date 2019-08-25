@@ -22,16 +22,10 @@ interface AppState {
 }
 
 const getBlankMapObject = (): IMapObject => {
-  let mapObject = Object.keys(countries).reduce(
-    (obj, countryCode) => Object.assign(obj, { [countryCode]: 0 }),
+  const mapObject = Object.keys(countries).reduce(
+    (obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }),
     {}
   );
-  for (const country of Object.keys(countries)) {
-    mapObject = Object.keys(countries[country]).reduce(
-      (obj, subdivisionCode) => Object.assign(obj, { [subdivisionCode]: 0 }),
-      mapObject
-    );
-  }
   return mapObject;
 };
 
@@ -137,6 +131,8 @@ class Map extends React.Component<OuterProps, AppState> {
       backgroundColor: "#90C0E0"
     };
 
+    const url = "http://matome-dev:8080/{this.state.mapParameter}";
+
     return (
       <div>
         <Chart
@@ -152,8 +148,8 @@ class Map extends React.Component<OuterProps, AppState> {
           options={options}
           data={mapData}
         />
+        <input type="text" value={url} />
         <button onClick={this.backHandler}>戻る</button>
-        <div>http://matome-dev:8080/{this.state.mapParameter}</div>
       </div>
     );
   }
