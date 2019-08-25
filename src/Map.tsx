@@ -52,8 +52,15 @@ class Map extends React.Component<OuterProps, AppState> {
   }
 
   transMapData = (mapObject: IMapObject): Array<any> => {
-    const mapArray = Object.entries(mapObject);
-    const mapData = [["Region", "Data"], ...mapArray];
+    const mapArray = Object.entries(mapObject).map(m => {
+      const areaName = countries[m[0]][0];
+      const percentage = `${m[1]}%`;
+      return [...m, `${areaName} ${percentage}`];
+    });
+    const mapData = [
+      ["Country", "Value", { role: "tooltip", p: { html: true } }],
+      ...mapArray
+    ];
     return mapData;
   };
 
@@ -99,7 +106,7 @@ class Map extends React.Component<OuterProps, AppState> {
       areaData => areaData[1]
     );
     const countryScore: number =
-      30 + (countriesDistrictsVisited.length / countriesDistricts.length) * 70;
+      (countriesDistrictsVisited.length / countriesDistricts.length) * 100;
     mapObject[countryCode] = countryScore;
 
     const updatedMapData = this.transMapData(mapObject);
@@ -131,7 +138,7 @@ class Map extends React.Component<OuterProps, AppState> {
       backgroundColor: "#90C0E0"
     };
 
-    const url = "http://matome-dev:8080/{this.state.mapParameter}";
+    const url = `{http://matome-dev:8080/${this.state.mapParameter}`;
 
     return (
       <div>
