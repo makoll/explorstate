@@ -3,6 +3,7 @@ import * as queryString from "query-string";
 import * as H from "history";
 import Chart from "react-google-charts";
 import countries from "./data/countries";
+import relations from "./data/relations";
 import { decode, encode } from "./util/util";
 
 interface OuterProps {
@@ -77,6 +78,13 @@ class Map extends React.Component<OuterProps, AppState> {
     return allDataObject;
   };
 
+  onClickCountryHandler = (countryCode: string) => {
+    this.setState({
+      region: countryCode,
+      resolution: "provinces"
+    });
+  };
+
   selectHandler = ({ chartWrapper }: MapSelectProps) => {
     const { mapObject, mapData } = this.state;
 
@@ -128,7 +136,7 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   render() {
-    const { mapData } = this.state;
+    const { mapData, mapObject } = this.state;
 
     const options = {
       region: this.state.region,
@@ -157,6 +165,38 @@ class Map extends React.Component<OuterProps, AppState> {
         />
         <input type="text" value={url} />
         <button onClick={this.backHandler}>戻る</button>
+        {Object.entries(relations).map((relation, i) => {
+          return (
+            <div key={i}>
+              <div>{relation[0]}</div>
+              {Object.entries(relation[1]).map((region, ri) => {
+                return (
+                  <div key={ri}>
+                    <div>{region[0]}</div>
+                    {region[1].map((countryCode, ci) => {
+                      const countryName = countries[countryCode];
+                      if (!countryName) {
+                        return null;
+                      }
+                      return (
+                        <div
+                          key={ci}
+                          onClick={() =>
+                            this.onClickCountryHandler(countryCode)
+                          }
+                        >
+                          <div>
+                            {countryName[0]}: {mapObject[countryCode]}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     );
   }
