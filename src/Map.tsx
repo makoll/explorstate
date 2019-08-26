@@ -2,6 +2,8 @@ import * as React from "react";
 import * as queryString from "query-string";
 import * as H from "history";
 import Chart from "react-google-charts";
+import styled from "styled-components";
+
 import countries from "./data/countries";
 import relations from "./data/relations";
 import { decode, encode } from "./util/util";
@@ -20,6 +22,7 @@ interface AppState {
   mapObject: IMapObject;
   mapParameter: string;
   mapData: Array<any>;
+  selectedMiddleRegion: string;
 }
 
 const getBlankMapObject = (): IMapObject => {
@@ -45,6 +48,7 @@ class Map extends React.Component<OuterProps, AppState> {
       mapObject,
       mapParameter,
       mapData,
+      selectedMiddleRegion: "",
     };
   }
 
@@ -123,6 +127,11 @@ class Map extends React.Component<OuterProps, AppState> {
     });
   };
 
+  onClickMiddleRegion = (middleRegionCode: string) => {
+    const selectedMiddleRegion = middleRegionCode === this.state.selectedMiddleRegion ? "" : middleRegionCode;
+    this.setState({ selectedMiddleRegion });
+  };
+
   render() {
     const { mapData, mapObject } = this.state;
 
@@ -153,35 +162,76 @@ class Map extends React.Component<OuterProps, AppState> {
         />
         <input type="text" value={url} />
         <button onClick={this.backHandler}>戻る</button>
-        {Object.entries(relations).map((relation, i) => {
-          return (
-            <div key={i}>
-              <div>{relation[0]}</div>
-              {Object.entries(relation[1]).map((region, ri) => {
-                return (
-                  <div key={ri}>
-                    <div>{region[0]}</div>
-                    {region[1].map((countryCode, ci) => {
-                      const countryName = countries[countryCode];
-                      if (!countryName) {
-                        return null;
-                      }
-                      return (
-                        <div key={ci} onClick={() => this.onClickCountryHandler(countryCode)}>
-                          <div>
-                            {countryName[0]}: {mapObject[countryCode]}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+        <Countries>
+          {Object.entries(relations).map((relation, i) => {
+            return (
+              <ContinentRegion key={i}>
+                <div>{relation[0]}</div>
+                {Object.entries(relation[1]).map((region, ri) => {
+                  const middleRegionCode = region[0];
+                  return (
+                    <MiddleRegion onClick={() => this.onClickMiddleRegion(middleRegionCode)} key={ri}>
+                      <div>{middleRegionCode}</div>
+                      {region[1].map((countryCode, ci) => {
+                        const countryName = countries[countryCode];
+                        if (!countryName) {
+                          return null;
+                        }
+                        const isDisplay: boolean = this.state.selectedMiddleRegion === middleRegionCode;
+                        const displayScore: number = Math.round(mapObject[countryCode] * 100) / 100;
+                        return (
+                          <Country
+                            onClick={() => this.onClickCountryHandler(countryCode)}
+                            isDisplay={isDisplay}
+                            key={ci}
+                          >
+                            <div>
+                              {countryName[0]}: {displayScore}
+                            </div>
+                          </Country>
+                        );
+                      })}
+                    </MiddleRegion>
+                  );
+                })}
+              </ContinentRegion>
+            );
+          })}
+        </Countries>
       </div>
     );
   }
 }
+
+const Countries = styled.div`
+  display: flex;
+  max-width: 1505px;
+  text-align: center;
+`;
+
+const ContinentRegion = styled.div`
+  background-color: #edcccc;
+  border: 1px solid #ddbcbc
+  border-right: 0px;
+  width: 300px;
+  height: 100%;
+`;
+
+const MiddleRegion = styled.div`
+  background-color: #edddcc;
+  border: 1px solid #ddcdbc;
+  border-right: 0px;
+`;
+
+interface CountryProps {
+  isDisplay: boolean;
+}
+
+const Country = styled.div`
+  background-color: #ededcc;
+  border: 1px solid #ddddbc;
+  border-right: 0px;
+  display: ${(props: CountryProps) => (props.isDisplay ? "block" : "none")};
+`;
+
 export default Map;
