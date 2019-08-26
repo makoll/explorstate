@@ -1,49 +1,8 @@
 const relations = {
   Europe: {
-    "Northern Europe": [
-      "GG",
-      "JE",
-      "AX",
-      "DK",
-      "EE",
-      "FI",
-      "FO",
-      "GB",
-      "IE",
-      "IM",
-      "IS",
-      "LT",
-      "LV",
-      "NO",
-      "SE",
-      "SJ"
-    ],
-    "Western Europe": [
-      "AT",
-      "BE",
-      "CH",
-      "DE",
-      "DD",
-      "FR",
-      "FX",
-      "LI",
-      "LU",
-      "MC",
-      "NL"
-    ],
-    "Eastern Europe": [
-      "BG",
-      "BY",
-      "CZ",
-      "HU",
-      "MD",
-      "PL",
-      "RO",
-      "RU",
-      "SU",
-      "SK",
-      "UA"
-    ],
+    "Northern Europe": ["GG", "JE", "AX", "DK", "EE", "FI", "FO", "GB", "IE", "IM", "IS", "LT", "LV", "NO", "SE", "SJ"],
+    "Western Europe": ["AT", "BE", "CH", "DE", "DD", "FR", "FX", "LI", "LU", "MC", "NL"],
+    "Eastern Europe": ["BG", "BY", "CZ", "HU", "MD", "PL", "RO", "RU", "SU", "SK", "UA"],
     "Southern Europe": [
       "AD",
       "AL",
@@ -62,8 +21,8 @@ const relations = {
       "SI",
       "SM",
       "VA",
-      "YU"
-    ]
+      "YU",
+    ],
   },
   Americas: {
     "Northern America": ["BM", "CA", "GL", "PM", "US"],
@@ -93,45 +52,16 @@ const relations = {
       "TT",
       "VC",
       "VG",
-      "VI"
+      "VI",
     ],
     "Central America": ["BZ", "CR", "GT", "HN", "MX", "NI", "PA", "SV"],
-    "South America": [
-      "AR",
-      "BO",
-      "BR",
-      "CL",
-      "CO",
-      "EC",
-      "FK",
-      "GF",
-      "GY",
-      "PE",
-      "PY",
-      "SR",
-      "UY",
-      "VE"
-    ]
+    "South America": ["AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PE", "PY", "SR", "UY", "VE"],
   },
   Asia: {
     "Central Asia": ["TM", "TJ", "KG", "KZ", "UZ"],
     "Eastern Asia": ["CN", "HK", "JP", "KP", "KR", "MN", "MO", "TW"],
     "Southern Asia": ["AF", "BD", "BT", "IN", "IR", "LK", "MV", "NP", "PK"],
-    "South-Eastern Asia": [
-      "BN",
-      "ID",
-      "KH",
-      "LA",
-      "MM",
-      "BU",
-      "MY",
-      "PH",
-      "SG",
-      "TH",
-      "TL",
-      "TP",
-      "VN"
-    ],
+    "South-Eastern Asia": ["BN", "ID", "KH", "LA", "MM", "BU", "MY", "PH", "SG", "TH", "TL", "TP", "VN"],
     "Western Asia": [
       "AE",
       "AM",
@@ -152,8 +82,8 @@ const relations = {
       "SY",
       "TR",
       "YE",
-      "YD"
-    ]
+      "YD",
+    ],
   },
   Africa: {
     "Northern Africa": ["DZ", "EG", "EH", "LY", "MA", "SD", "SS", "TN"],
@@ -174,20 +104,9 @@ const relations = {
       "SH",
       "SL",
       "SN",
-      "TG"
+      "TG",
     ],
-    "Middle Africa": [
-      "AO",
-      "CD",
-      "ZR",
-      "CF",
-      "CG",
-      "CM",
-      "GA",
-      "GQ",
-      "ST",
-      "TD"
-    ],
+    "Middle Africa": ["AO", "CD", "ZR", "CF", "CG", "CM", "GA", "GQ", "ST", "TD"],
     "Eastern Africa": [
       "BI",
       "DJ",
@@ -207,15 +126,15 @@ const relations = {
       "UG",
       "YT",
       "ZM",
-      "ZW"
+      "ZW",
     ],
-    "Southern Africa": ["BW", "LS", "NA", "SZ", "ZA"]
+    "Southern Africa": ["BW", "LS", "NA", "SZ", "ZA"],
   },
   Oceania: {
     "Australia and New Zealand": ["AU", "NF", "NZ"],
     Melanesia: ["FJ", "NC", "PG", "SB", "VU"],
     Micronesia: ["FM", "GU", "KI", "MH", "MP", "NR", "PW"],
-    Polynesia: ["AS", "CK", "NU", "PF", "PN", "TK", "TO", "TV", "WF", "WS"]
-  }
+    Polynesia: ["AS", "CK", "NU", "PF", "PN", "TK", "TO", "TV", "WF", "WS"],
+  },
 };
 export default relations;

@@ -23,10 +23,7 @@ interface AppState {
 }
 
 const getBlankMapObject = (): IMapObject => {
-  const mapObject = Object.keys(countries).reduce(
-    (obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }),
-    {}
-  );
+  const mapObject = Object.keys(countries).reduce((obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }), {});
   return mapObject;
 };
 
@@ -38,8 +35,7 @@ class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
 
-    const mapObject: IMapObject =
-      this.getParamMapObject() || getBlankMapObject();
+    const mapObject: IMapObject = this.getParamMapObject() || getBlankMapObject();
     const mapData = this.transMapData(mapObject);
     const mapParameter: string = "";
 
@@ -48,7 +44,7 @@ class Map extends React.Component<OuterProps, AppState> {
       resolution: "",
       mapObject,
       mapParameter,
-      mapData
+      mapData,
     };
   }
 
@@ -58,10 +54,7 @@ class Map extends React.Component<OuterProps, AppState> {
       const percentage = `${m[1]}%`;
       return [...m, `${areaName} ${percentage}`];
     });
-    const mapData = [
-      ["Country", "Value", { role: "tooltip", p: { html: true } }],
-      ...mapArray
-    ];
+    const mapData = [["Country", "Value", { role: "tooltip", p: { html: true } }], ...mapArray];
     return mapData;
   };
 
@@ -81,7 +74,7 @@ class Map extends React.Component<OuterProps, AppState> {
   onClickCountryHandler = (countryCode: string) => {
     this.setState({
       region: countryCode,
-      resolution: "provinces"
+      resolution: "provinces",
     });
   };
 
@@ -97,7 +90,7 @@ class Map extends React.Component<OuterProps, AppState> {
     if (region === "world" || !selectedAreaCode.startsWith(region)) {
       this.setState({
         region: selectedAreaCode,
-        resolution: "provinces"
+        resolution: "provinces",
       });
       return;
     }
@@ -107,14 +100,9 @@ class Map extends React.Component<OuterProps, AppState> {
     const countryCode: string = selectedAreaCode.split("-")[0];
     const mapArray = Object.entries(mapObject);
 
-    const countriesDistricts = mapArray.filter(areaData =>
-      areaData[0].startsWith(countryCode)
-    );
-    const countriesDistrictsVisited = countriesDistricts.filter(
-      areaData => areaData[1]
-    );
-    const countryScore: number =
-      (countriesDistrictsVisited.length / countriesDistricts.length) * 100;
+    const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(countryCode));
+    const countriesDistrictsVisited = countriesDistricts.filter(areaData => areaData[1]);
+    const countryScore: number = (countriesDistrictsVisited.length / countriesDistricts.length) * 100;
     mapObject[countryCode] = countryScore;
 
     const updatedMapData = this.transMapData(mapObject);
@@ -124,14 +112,14 @@ class Map extends React.Component<OuterProps, AppState> {
     this.setState({
       mapObject,
       mapData: updatedMapData,
-      mapParameter
+      mapParameter,
     });
   };
 
   backHandler = () => {
     this.setState({
       region: "world",
-      resolution: ""
+      resolution: "",
     });
   };
 
@@ -143,7 +131,7 @@ class Map extends React.Component<OuterProps, AppState> {
       resolution: this.state.resolution,
       legend: "none",
       colorAxis: { minValue: 0, colors: ["#C0D0E0", "#CCEDCC"] },
-      backgroundColor: "#90C0E0"
+      backgroundColor: "#90C0E0",
     };
 
     const url = `{http://matome-dev:8080/${this.state.mapParameter}`;
@@ -154,8 +142,8 @@ class Map extends React.Component<OuterProps, AppState> {
           chartEvents={[
             {
               eventName: "select",
-              callback: this.selectHandler
-            }
+              callback: this.selectHandler,
+            },
           ]}
           chartType="GeoChart"
           width="100%"
@@ -179,12 +167,7 @@ class Map extends React.Component<OuterProps, AppState> {
                         return null;
                       }
                       return (
-                        <div
-                          key={ci}
-                          onClick={() =>
-                            this.onClickCountryHandler(countryCode)
-                          }
-                        >
+                        <div key={ci} onClick={() => this.onClickCountryHandler(countryCode)}>
                           <div>
                             {countryName[0]}: {mapObject[countryCode]}
                           </div>
