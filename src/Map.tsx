@@ -67,10 +67,7 @@ class Map extends React.Component<OuterProps, AppState> {
     if (!getParams.mapGetParam) {
       return null;
     }
-    let cdStr: string | string[] = getParams.mapGetParam;
-    if (typeof cdStr !== "string") {
-      cdStr = "";
-    }
+    const cdStr = typeof getParams.mapGetParam === "string" ? getParams.mapGetParam : "";
     const allDataObject: IMapObject = JSON.parse(decode(cdStr));
     return allDataObject;
   };
@@ -160,7 +157,7 @@ class Map extends React.Component<OuterProps, AppState> {
           options={options}
           data={mapData}
         />
-        <input type="text" value={url} />
+        <input type="text" value={url} readOnly />
         <button onClick={this.backHandler}>戻る</button>
         <Countries>
           {Object.entries(relations).map((relation, i) => {
