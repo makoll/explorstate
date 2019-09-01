@@ -72,15 +72,12 @@ class Map extends React.Component<OuterProps, AppState> {
     return allDataObject;
   };
 
-  onClickCountryHandler = (countryCode: string) => {
-    this.setState({
-      region: countryCode,
-      resolution: "provinces",
-    });
+  onClickCountryNameHandler = (countryCode: string) => {
+    this.choiseCountry(countryCode);
   };
 
-  selectHandler = ({ chartWrapper }: MapSelectProps) => {
-    const { mapObject, mapData } = this.state;
+  selectCountryOnMapHandler = ({ chartWrapper }: MapSelectProps) => {
+    const { mapData } = this.state;
 
     const chart = chartWrapper.getChart();
     const selection = chart.getSelection();
@@ -89,16 +86,41 @@ class Map extends React.Component<OuterProps, AppState> {
 
     const { region } = chartWrapper.getOptions();
     if (region === "world" || !selectedAreaCode.startsWith(region)) {
+      this.choiseCountry(selectedAreaCode);
+      return;
+    }
+
+    this.choiseCountryDistrict(selectedAreaCode);
+  };
+
+  choiseCountry = (countryCode: string) => {
+    const { mapObject, mapData } = this.state;
+    const mapArray = Object.entries(mapObject);
+    const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
+    // 行政区がある場合
+    if (0 < countriesDistricts.length) {
       this.setState({
-        region: selectedAreaCode,
+        region: countryCode,
         resolution: "provinces",
       });
       return;
     }
 
-    mapObject[selectedAreaCode] = mapObject[selectedAreaCode] ? 0 : 100;
+    mapObject[countryCode] = mapObject[countryCode] ? 0 : 100;
+    const updatedMapData = this.transMapData(mapObject);
+    const mapParameter = `?mapGetParam=${encode(JSON.stringify(mapObject))}`;
+    this.setState({
+      mapObject,
+      mapData: updatedMapData,
+      mapParameter,
+    });
+  };
 
-    const countryCode: string = selectedAreaCode.split("-")[0];
+  choiseCountryDistrict = (countryDistrictCode: string) => {
+    const { mapObject } = this.state;
+    mapObject[countryDistrictCode] = mapObject[countryDistrictCode] ? 0 : 100;
+
+    const countryCode: string = countryDistrictCode.split("-")[0];
     const mapArray = Object.entries(mapObject);
 
     const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
@@ -124,7 +146,7 @@ class Map extends React.Component<OuterProps, AppState> {
     });
   };
 
-  onClickMiddleRegion = (middleRegionCode: string) => {
+  onClickMiddleRegionHandler = (middleRegionCode: string) => {
     const selectedMiddleRegion = middleRegionCode === this.state.selectedMiddleRegion ? "" : middleRegionCode;
     this.setState({ selectedMiddleRegion });
   };
@@ -148,7 +170,7 @@ class Map extends React.Component<OuterProps, AppState> {
           chartEvents={[
             {
               eventName: "select",
-              callback: this.selectHandler,
+              callback: this.selectCountryOnMapHandler,
             },
           ]}
           chartType="GeoChart"
@@ -167,7 +189,7 @@ class Map extends React.Component<OuterProps, AppState> {
                 {Object.entries(relation[1]).map((region, ri) => {
                   const middleRegionCode = region[0];
                   return (
-                    <MiddleRegion onClick={() => this.onClickMiddleRegion(middleRegionCode)} key={ri}>
+                    <MiddleRegion onClick={() => this.onClickMiddleRegionHandler(middleRegionCode)} key={ri}>
                       <div>{middleRegionCode}</div>
                       {region[1].map((countryCode, ci) => {
                         const countryName = countries[countryCode];
@@ -178,7 +200,7 @@ class Map extends React.Component<OuterProps, AppState> {
                         const displayScore: number = Math.round(mapObject[countryCode] * 100) / 100;
                         return (
                           <Country
-                            onClick={() => this.onClickCountryHandler(countryCode)}
+                            onClick={() => this.onClickCountryNameHandler(countryCode)}
                             isDisplay={isDisplay}
                             key={ci}
                           >
