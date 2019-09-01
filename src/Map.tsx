@@ -140,7 +140,7 @@ class Map extends React.Component<OuterProps, AppState> {
       backgroundColor: "#90C0E0",
     };
 
-    const url = `{http://matome-dev:8080/${this.state.mapParameter}`;
+    const url = `http://matome-dev:8080/${this.state.mapParameter}`;
 
     return (
       <div>
