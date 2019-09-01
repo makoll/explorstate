@@ -101,7 +101,7 @@ class Map extends React.Component<OuterProps, AppState> {
     const countryCode: string = selectedAreaCode.split("-")[0];
     const mapArray = Object.entries(mapObject);
 
-    const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(countryCode));
+    const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     const countriesDistrictsVisited = countriesDistricts.filter(areaData => areaData[1]);
     const countryScore: number = (countriesDistrictsVisited.length / countriesDistricts.length) * 100;
     mapObject[countryCode] = countryScore;
