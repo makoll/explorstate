@@ -21,6 +21,7 @@ const relations = {
       "SI",
       "SM",
       "VA",
+      "XK",
       "YU",
     ],
   },

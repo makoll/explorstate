@@ -728,6 +728,7 @@ const countries: { [key: string]: Array<string> } = {
   VU: ["Vanuatu", "バヌアツ"],
   WF: ["Wallis and Futuna", "ワリスフュチュナ"],
   WS: ["Samoa", "サモア"],
+  XK: ["kosovo", "コソボ"],
   YE: ["Yemen", "イエメン"],
   YT: ["Mayotte", "マヨット島"],
   ZA: ["South Africa", "南アフリカ共和国"],
