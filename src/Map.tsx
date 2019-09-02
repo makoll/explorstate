@@ -55,8 +55,11 @@ class Map extends React.Component<OuterProps, AppState> {
   transMapData = (mapObject: IMapObject): Array<any> => {
     const mapArray = Object.entries(mapObject).map(m => {
       const areaName = countries[m[0]][0];
+      const areaNameSub = countries[m[0]][1];
+      const displayAreaNameSub = areaNameSub ? ` (${areaNameSub})` : "";
+      const displayAreaName = `${areaName}${displayAreaNameSub}`;
       const percentage = `${m[1]}%`;
-      return [...m, `${areaName} ${percentage}`];
+      return [...m, `${displayAreaName} ${percentage}`];
     });
     const mapData = [["Country", "Value", { role: "tooltip", p: { html: true } }], ...mapArray];
     return mapData;
@@ -205,7 +208,7 @@ class Map extends React.Component<OuterProps, AppState> {
                             key={ci}
                           >
                             <div>
-                              {countryName[0]}: {displayScore}
+                              {countryName[0]} ({countryName[1]}): {displayScore}
                             </div>
                           </Country>
                         );
