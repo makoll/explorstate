@@ -4,7 +4,8 @@ import * as ReactGA from "react-ga";
 
 import Map from "./Map";
 
-ReactGA.initialize("UA-147024416-1");
+const trackingId = process.env.NODE_ENV === "production" ? "UA-147024416-1" : "UA-147024416-2";
+ReactGA.initialize(trackingId);
 interface OuterProps {}
 interface AppState {}
 class App extends React.Component<OuterProps, AppState> {
