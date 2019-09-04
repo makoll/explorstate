@@ -1,8 +1,6 @@
 import * as React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import * as ReactGA from "react-ga";
-// import * as H from "history";
-// import createBrowserHistory from "history/createBrowserHistory";
 
 import Map from "./Map";
 

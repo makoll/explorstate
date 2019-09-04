@@ -26,7 +26,6 @@
     "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
-    "history": "^4.9.0",
     "query-string": "^6.8.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
