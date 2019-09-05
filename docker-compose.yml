@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  spa:
+    build:
+      context: .
+      target: builder
+    command: /bin/sh -c "yarn && yarn run start"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app/:cached
