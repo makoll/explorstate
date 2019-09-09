@@ -6,6 +6,6 @@ services:
       target: builder
     command: /bin/sh -c "yarn && yarn run start"
     ports:
-      - "8080:8080"
+      - "80:8080"
     volumes:
       - ./:/app/:cached
