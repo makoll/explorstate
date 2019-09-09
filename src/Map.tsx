@@ -20,8 +20,7 @@ interface AppState {
   region: string;
   resolution: string;
   mapObject: IMapObject;
-  mapParameter: string;
-  mapData: Array<any>;
+  lastMapData: Array<any>;
   selectedMiddleRegion: string;
 }
 
@@ -37,19 +36,20 @@ interface MapSelectProps {
 class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
-
-    const mapObject: IMapObject = this.getParamMapObject() || getBlankMapObject();
-    const mapData = this.transMapData(mapObject);
-    const mapParameter: string = "";
-
+    const mapObject: IMapObject = Object.assign(getBlankMapObject(), this.getParamMapObject());
     this.state = {
       region: "world",
       resolution: "",
       mapObject,
-      mapParameter,
-      mapData,
+      lastMapData: [],
       selectedMiddleRegion: "",
     };
+  }
+
+  componentDidMount = () => {
+    const { mapObject } = this.state;
+    const mapData = this.transMapData(mapObject);
+    this.setState({ lastMapData: mapData });
   }
 
   transMapData = (mapObject: IMapObject): Array<any> => {
@@ -80,12 +80,12 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   selectCountryOnMapHandler = ({ chartWrapper }: MapSelectProps) => {
-    const { mapData } = this.state;
+    const { lastMapData } = this.state;
 
     const chart = chartWrapper.getChart();
     const selection = chart.getSelection();
     const selectedAreaIndex = selection[0].row + 1;
-    const selectedAreaCode = mapData[selectedAreaIndex][0];
+    const selectedAreaCode = lastMapData[selectedAreaIndex][0];
 
     const { region } = chartWrapper.getOptions();
     if (region === "world" || !selectedAreaCode.startsWith(region)) {
@@ -97,7 +97,7 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   choiseCountry = (countryCode: string) => {
-    const { mapObject, mapData } = this.state;
+    const { mapObject } = this.state;
     const mapArray = Object.entries(mapObject);
     const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     // 行政区がある場合
@@ -110,13 +110,7 @@ class Map extends React.Component<OuterProps, AppState> {
     }
 
     mapObject[countryCode] = mapObject[countryCode] ? 0 : 100;
-    const updatedMapData = this.transMapData(mapObject);
-    const mapParameter = `?mapGetParam=${encode(JSON.stringify(mapObject))}`;
-    this.setState({
-      mapObject,
-      mapData: updatedMapData,
-      mapParameter,
-    });
+    this.setState({ mapObject });
   };
 
   choiseCountryDistrict = (countryDistrictCode: string) => {
@@ -131,16 +125,14 @@ class Map extends React.Component<OuterProps, AppState> {
     const countryScore: number = (countriesDistrictsVisited.length / countriesDistricts.length) * 100;
     mapObject[countryCode] = countryScore;
 
-    const updatedMapData = this.transMapData(mapObject);
-
-    const mapParameter = `?mapGetParam=${encode(JSON.stringify(mapObject))}`;
-
-    this.setState({
-      mapObject,
-      mapData: updatedMapData,
-      mapParameter,
-    });
+    this.setState({ mapObject });
   };
+
+  generateMapParameter = (mapObject: IMapObject): string => {
+    const hasValueMapArray: Array<any> = Object.entries(mapObject).filter(m => 0 < m[1]);
+    const hasValueMapObject = hasValueMapArray.reduce((obj, data) => ({ ...obj, [data[0]]: data[1] }), {});
+    return `?mapGetParam=${encode(JSON.stringify(hasValueMapObject))}`;
+  }
 
   backHandler = () => {
     this.setState({
@@ -155,7 +147,9 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   render() {
-    const { mapData, mapObject } = this.state;
+    const { mapObject } = this.state;
+
+    const mapData = this.transMapData(mapObject);
 
     const options = {
       region: this.state.region,
@@ -165,7 +159,8 @@ class Map extends React.Component<OuterProps, AppState> {
       backgroundColor: "#90C0E0",
     };
 
-    const url = `http://matome-dev:8080/${this.state.mapParameter}`;
+    const mapParameter = this.generateMapParameter(mapObject);
+    const url = `${document.domain}/${mapParameter}`;
 
     return (
       <div>
