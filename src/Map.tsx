@@ -155,7 +155,7 @@ class Map extends React.Component<OuterProps, AppState> {
       region: this.state.region,
       resolution: this.state.resolution,
       legend: "none",
-      colorAxis: { minValue: 0, colors: ["#C0D0E0", "#CCEDCC"] },
+      colorAxis: { colors: ["white", "#EDEDCC", "#CCEDCC"] },
       backgroundColor: "#90C0E0",
     };
 
