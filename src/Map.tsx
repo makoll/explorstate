@@ -177,8 +177,8 @@ class Map extends React.Component<OuterProps, AppState> {
           options={options}
           data={mapData}
         />
-        <input type="text" value={url} readOnly />
-        <button onClick={this.backHandler}>戻る</button>
+        <button onClick={this.backHandler}>Topへ</button>
+        <UrlCopy type="text" value={url} readOnly />
         <Countries>
           {Object.entries(relations).map((relation, i) => {
             return (
@@ -249,6 +249,10 @@ const Country = styled.div`
   border: 1px solid #ddddbc;
   border-right: 0px;
   display: ${(props: CountryProps) => (props.isDisplay ? "block" : "none")};
+`;
+
+const UrlCopy = styled.input`
+  width: 100%;
 `;
 
 export default Map;
