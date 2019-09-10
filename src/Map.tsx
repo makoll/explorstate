@@ -6,6 +6,7 @@ import styled from "styled-components";
 
 import countries from "./data/countries";
 import relations from "./data/relations";
+import region_mapping from "./data/region_mapping";
 import { decode, encode } from "./util/util";
 
 interface OuterProps {
@@ -75,8 +76,9 @@ class Map extends React.Component<OuterProps, AppState> {
     return allDataObject;
   };
 
-  onClickCountryNameHandler = (countryCode: string) => {
+  onClickCountryNameHandler = (e: React.MouseEvent, countryCode: string) => {
     this.choiseCountry(countryCode);
+    e.stopPropagation();
   };
 
   selectCountryOnMapHandler = ({ chartWrapper }: MapSelectProps) => {
@@ -141,9 +143,18 @@ class Map extends React.Component<OuterProps, AppState> {
     });
   };
 
-  onClickMiddleRegionHandler = (middleRegionCode: string) => {
+  onClickContinentRegionHandler = (continentRegionCode: string) => {
+    const region: string = region_mapping[continentRegionCode];
+    const resolution = "";
+    this.setState({ region, resolution });
+  };
+
+  onClickMiddleRegionHandler = (e: React.MouseEvent, middleRegionCode: string) => {
     const selectedMiddleRegion = middleRegionCode === this.state.selectedMiddleRegion ? "" : middleRegionCode;
-    this.setState({ selectedMiddleRegion });
+    const region: string = region_mapping[middleRegionCode];
+    const resolution = "";
+    this.setState({ selectedMiddleRegion, region, resolution });
+    e.stopPropagation();
   };
 
   render() {
@@ -181,13 +192,14 @@ class Map extends React.Component<OuterProps, AppState> {
         <UrlCopy type="text" value={url} readOnly />
         <Countries>
           {Object.entries(relations).map((relation, i) => {
+            const continentRegionCode = relation[0];
             return (
-              <ContinentRegion key={i}>
+              <ContinentRegion onClick={() => this.onClickContinentRegionHandler(continentRegionCode)} key={i}>
                 <div>{relation[0]}</div>
                 {Object.entries(relation[1]).map((region, ri) => {
                   const middleRegionCode = region[0];
                   return (
-                    <MiddleRegion onClick={() => this.onClickMiddleRegionHandler(middleRegionCode)} key={ri}>
+                    <MiddleRegion onClick={(e) => this.onClickMiddleRegionHandler(e, middleRegionCode)} key={ri}>
                       <div>{middleRegionCode}</div>
                       {region[1].map((countryCode, ci) => {
                         const countryName = countries[countryCode];
@@ -198,7 +210,7 @@ class Map extends React.Component<OuterProps, AppState> {
                         const displayScore: number = Math.round(mapObject[countryCode] * 100) / 100;
                         return (
                           <Country
-                            onClick={() => this.onClickCountryNameHandler(countryCode)}
+                            onClick={(e) => this.onClickCountryNameHandler(e, countryCode)}
                             isDisplay={isDisplay}
                             key={ci}
                           >
