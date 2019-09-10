@@ -157,6 +157,98 @@ class Map extends React.Component<OuterProps, AppState> {
     e.stopPropagation();
   };
 
+  CountriesList = () => {
+    return (
+      <CountriesListWrapper>
+        {Object.entries(relations).map((relation, i) => {
+          const continentRegionCode = relation[0];
+          const continentRelations = relation[1];
+          return (
+            <this.ContinentRegion
+              continentRegionCode={continentRegionCode}
+              continentRelations={continentRelations}
+              key={i}
+            />
+          );
+        })}
+      </CountriesListWrapper>
+    )
+  };
+
+  ContinentRegion = (props: ContinentRegionProps) => {
+    const {
+      continentRegionCode,
+      continentRelations,
+    } = props;
+    return (
+      <ContinentRegionWrapper onClick={() => this.onClickContinentRegionHandler(continentRegionCode)}>
+        <div>{continentRegionCode}</div>
+        {Object.entries(continentRelations).map((region, i) => {
+          const middleRegionCode = region[0];
+          const middleRegionCountries = region[1];
+          return (
+            <this.MiddleRegion
+              middleRegionCode={middleRegionCode}
+              middleRegionCountries={middleRegionCountries}
+              key={i}
+            />
+          );
+        })}
+      </ContinentRegionWrapper>
+    )
+  };
+
+  MiddleRegion = (props: MiddleRegionProps) => {
+    const { mapObject } = this.state;
+    const {
+      middleRegionCode,
+      middleRegionCountries,
+    } = props;
+    return (
+      <MiddleRegionWrapper onClick={(e) => this.onClickMiddleRegionHandler(e, middleRegionCode)}>
+        <div>{middleRegionCode}</div>
+        {middleRegionCountries.map((countryCode, i) => {
+          const countryName = countries[countryCode];
+          if (!countryName) {
+            return null;
+          }
+          const isDisplay: boolean = this.state.selectedMiddleRegion === middleRegionCode;
+          const displayScore: number = Math.round(mapObject[countryCode] * 100) / 100;
+          return (
+            <this.Country
+              isDisplay={isDisplay}
+              countryCode={countryCode}
+              countryName={countryName[0]}
+              countryNameSub={countryName[1]}
+              countryScore={displayScore}
+              key={i}
+            />
+          );
+        })}
+      </MiddleRegionWrapper>
+    )
+  };
+
+  Country = (props: CountryProps) => {
+    const {
+      isDisplay,
+      countryCode,
+      countryName,
+      countryNameSub,
+      countryScore,
+    } = props;
+    return (
+      <CountryWrapper
+        onClick={(e) => this.onClickCountryNameHandler(e, countryCode)}
+        isDisplay={isDisplay}
+      >
+        <div>
+          {countryName} ({countryNameSub}): {countryScore}
+        </div>
+      </CountryWrapper>
+    )
+  };
+
   render() {
     const { mapObject } = this.state;
 
@@ -190,55 +282,19 @@ class Map extends React.Component<OuterProps, AppState> {
         />
         <button onClick={this.backHandler}>Topへ</button>
         <UrlCopy type="text" value={url} readOnly />
-        <Countries>
-          {Object.entries(relations).map((relation, i) => {
-            const continentRegionCode = relation[0];
-            return (
-              <ContinentRegion onClick={() => this.onClickContinentRegionHandler(continentRegionCode)} key={i}>
-                <div>{relation[0]}</div>
-                {Object.entries(relation[1]).map((region, ri) => {
-                  const middleRegionCode = region[0];
-                  return (
-                    <MiddleRegion onClick={(e) => this.onClickMiddleRegionHandler(e, middleRegionCode)} key={ri}>
-                      <div>{middleRegionCode}</div>
-                      {region[1].map((countryCode, ci) => {
-                        const countryName = countries[countryCode];
-                        if (!countryName) {
-                          return null;
-                        }
-                        const isDisplay: boolean = this.state.selectedMiddleRegion === middleRegionCode;
-                        const displayScore: number = Math.round(mapObject[countryCode] * 100) / 100;
-                        return (
-                          <Country
-                            onClick={(e) => this.onClickCountryNameHandler(e, countryCode)}
-                            isDisplay={isDisplay}
-                            key={ci}
-                          >
-                            <div>
-                              {countryName[0]} ({countryName[1]}): {displayScore}
-                            </div>
-                          </Country>
-                        );
-                      })}
-                    </MiddleRegion>
-                  );
-                })}
-              </ContinentRegion>
-            );
-          })}
-        </Countries>
+        <this.CountriesList />
       </div>
     );
   }
 }
 
-const Countries = styled.div`
+const CountriesListWrapper = styled.div`
   display: flex;
   max-width: 1505px;
   text-align: center;
 `;
 
-const ContinentRegion = styled.div`
+const ContinentRegionWrapper = styled.div`
   background-color: #edcccc;
   border: 1px solid #ddbcbc
   border-right: 0px;
@@ -246,25 +302,43 @@ const ContinentRegion = styled.div`
   height: 100%;
 `;
 
-const MiddleRegion = styled.div`
+const MiddleRegionWrapper = styled.div`
   background-color: #edddcc;
   border: 1px solid #ddcdbc;
   border-right: 0px;
 `;
 
-interface CountryProps {
+interface CountryWrapperProps {
   isDisplay: boolean;
 }
 
-const Country = styled.div`
+const CountryWrapper = styled.div`
   background-color: #ededcc;
   border: 1px solid #ddddbc;
   border-right: 0px;
-  display: ${(props: CountryProps) => (props.isDisplay ? "block" : "none")};
+  display: ${(props: CountryWrapperProps) => (props.isDisplay ? "block" : "none")};
 `;
 
 const UrlCopy = styled.input`
   width: 100%;
 `;
+
+interface ContinentRegionProps {
+  continentRegionCode: string;
+  continentRelations: { [key: string]: Array<string> };
+}
+
+interface MiddleRegionProps {
+  middleRegionCode: string;
+  middleRegionCountries: Array<string>;
+}
+
+interface CountryProps {
+  isDisplay: boolean;
+  countryCode: string;
+  countryName: string;
+  countryNameSub: string;
+  countryScore: number;
+};
 
 export default Map;
