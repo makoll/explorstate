@@ -76,7 +76,7 @@ class Map extends React.Component<OuterProps, AppState> {
     return allDataObject;
   };
 
-  onClickCountryNameHandler = (e: React.MouseEvent, countryCode: string) => {
+  onClickAreaNameHandler = (e: React.MouseEvent, countryCode: string) => {
     this.choiseCountry(countryCode);
     e.stopPropagation();
   };
@@ -158,6 +158,10 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   CountriesList = () => {
+    const isDisplay: boolean = !(this.state.region in countries);
+    if (!isDisplay) {
+      return null;
+    }
     return (
       <CountriesListWrapper>
         {Object.entries(relations).map((relation, i) => {
@@ -239,13 +243,64 @@ class Map extends React.Component<OuterProps, AppState> {
     } = props;
     return (
       <CountryWrapper
-        onClick={(e) => this.onClickCountryNameHandler(e, countryCode)}
+        onClick={(e) => this.onClickAreaNameHandler(e, countryCode)}
         isDisplay={isDisplay}
       >
         <div>
           {countryName} ({countryNameSub}): {countryScore}
         </div>
       </CountryWrapper>
+    )
+  };
+
+  SubdivisionList = () => {
+    const isDisplay: boolean = this.state.region in countries;
+    if (!isDisplay) {
+      return null;
+    }
+    const { mapObject } = this.state;
+    const mapArray = Object.entries(countries);
+    const countryCode = this.state.region;
+    const subdivisions = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
+    return (
+      <SubdivisionListWrapper>
+        {subdivisions.map((subdivision, i) => {
+          const subdivisionCode = subdivision[0];
+          const subdivisionName = subdivision[1][0];
+          const subdivisionNameSub = subdivision[1][1];
+          const score: number = mapObject[subdivisionCode]
+          return (
+            <this.Subdivision
+              subdivisionCode={subdivisionCode}
+              subdivisionName={subdivisionName}
+              subdivisionNameSub={subdivisionNameSub}
+              score={score}
+              key={i}
+            />
+          );
+        })}
+      </SubdivisionListWrapper>
+    )
+  };
+
+  Subdivision = (props: SubdivisionProps) => {
+    const {
+      subdivisionCode,
+      subdivisionName,
+      subdivisionNameSub,
+      score
+    } = props;
+    const displayingSubdivisionNameSub = subdivisionNameSub ? `(${subdivisionNameSub})` : "";
+    const displayingScore = score ? "☑️" : "⬛️";
+    return (
+      <SubdivisionWrapper
+        onClick={(e) => this.onClickAreaNameHandler(e, subdivisionCode)}
+      >
+        <div>
+          <span>{subdivisionCode}: {subdivisionName} {displayingSubdivisionNameSub}</span>
+          <SubdivisionCheck>{displayingScore}</SubdivisionCheck>
+        </div>
+      </SubdivisionWrapper>
     )
   };
 
@@ -283,6 +338,7 @@ class Map extends React.Component<OuterProps, AppState> {
         <button onClick={this.backHandler}>Topへ</button>
         <UrlCopy type="text" value={url} readOnly />
         <this.CountriesList />
+        <this.SubdivisionList />
       </div>
     );
   }
@@ -319,8 +375,26 @@ const CountryWrapper = styled.div`
   display: ${(props: CountryWrapperProps) => (props.isDisplay ? "block" : "none")};
 `;
 
+const SubdivisionListWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap
+`;
+
+const SubdivisionWrapper = styled.div`
+  background-color: #ededcc;
+  border: 1px solid #ddddbc;
+  border-right: 0px;
+  width: 280px;
+  text-align: left;
+  padding: 0 10px
+`;
+
 const UrlCopy = styled.input`
   width: 100%;
+`;
+
+const SubdivisionCheck = styled.span`
+  float: right;
 `;
 
 interface ContinentRegionProps {
@@ -339,6 +413,13 @@ interface CountryProps {
   countryName: string;
   countryNameSub: string;
   countryScore: number;
+};
+
+interface SubdivisionProps {
+  subdivisionCode: string;
+  subdivisionName: string;
+  subdivisionNameSub: string;
+  score: number;
 };
 
 export default Map;
