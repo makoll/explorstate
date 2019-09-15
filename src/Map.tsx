@@ -7,7 +7,7 @@ import styled from "styled-components";
 import countries from "./data/countries";
 import relations from "./data/relations";
 import region_mapping from "./data/region_mapping";
-import { decode, encode } from "./util/util";
+// import { decode, encode } from "./util/util";
 
 interface OuterProps {
   location: H.Location;
@@ -23,6 +23,7 @@ interface AppState {
   mapObject: IMapObject;
   lastMapData: Array<any>;
   selectedMiddleRegion: string;
+  countryMiddleRegion: { [key: string]: string };
 }
 
 const getBlankMapObject = (): IMapObject => {
@@ -38,29 +39,47 @@ class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
     const mapObject: IMapObject = Object.assign(getBlankMapObject(), this.getParamMapObject());
+    const countryMiddleRegion = Object.keys(relations).reduce((o1, continentRegion) => {
+      return Object.keys(relations[continentRegion]).reduce((o2, middleRegion) => {
+        return relations[continentRegion][middleRegion].reduce((o3, country) => {
+          return Object.assign(o3, { [country]: middleRegion })
+        }, o2)
+      }, o1);
+    }, {});
     this.state = {
       region: "world",
       resolution: "",
       mapObject,
       lastMapData: [],
       selectedMiddleRegion: "",
+      countryMiddleRegion,
     };
   }
 
   componentDidMount = () => {
     const { mapObject } = this.state;
-    const mapData = this.transMapData(mapObject);
+    const mapData = this.transMapDataForDisplay(mapObject);
     this.setState({ lastMapData: mapData });
   }
 
-  transMapData = (mapObject: IMapObject): Array<any> => {
+  transMapDataForDisplay = (mapObject: IMapObject): Array<any> => {
     const mapArray = Object.entries(mapObject).map(m => {
-      const areaName = countries[m[0]][0];
-      const areaNameSub = countries[m[0]][1];
+      const { region } = this.state;
+      const areaCode = m[0];
+      const areaScore = m[1];
+      const areaName = countries[areaCode][0];
+      const areaNameSub = countries[areaCode][1];
       const displayAreaNameSub = areaNameSub ? ` (${areaNameSub})` : "";
       const displayAreaName = `${areaName}${displayAreaNameSub}`;
-      const percentage = `${m[1]}%`;
-      return [...m, `${displayAreaName} ${percentage}`];
+      let append = null;
+      if (region === "world" || !areaCode.startsWith(region)) {
+        const score: number = Math.round(areaScore * 1000) / 10;
+        append = `${score}%`;
+      } else {
+        const check = areaScore ? "☑️" : "⬛️";
+        append = check;
+      }
+      return [...m, `${displayAreaName} ${append}`];
     });
     const mapData = [["Country", "Value", { role: "tooltip", p: { html: true } }], ...mapArray];
     return mapData;
@@ -72,7 +91,7 @@ class Map extends React.Component<OuterProps, AppState> {
       return null;
     }
     const cdStr = typeof getParams.mapGetParam === "string" ? getParams.mapGetParam : "";
-    const allDataObject: IMapObject = JSON.parse(decode(cdStr));
+    const allDataObject: IMapObject = JSON.parse(cdStr);
     return allDataObject;
   };
 
@@ -111,20 +130,20 @@ class Map extends React.Component<OuterProps, AppState> {
       return;
     }
 
-    mapObject[countryCode] = mapObject[countryCode] ? 0 : 100;
+    mapObject[countryCode] = mapObject[countryCode] ? 0 : 1;
     this.setState({ mapObject });
   };
 
   choiseCountryDistrict = (countryDistrictCode: string) => {
     const { mapObject } = this.state;
-    mapObject[countryDistrictCode] = mapObject[countryDistrictCode] ? 0 : 100;
+    mapObject[countryDistrictCode] = mapObject[countryDistrictCode] ? 0 : 1;
 
     const countryCode: string = countryDistrictCode.split("-")[0];
     const mapArray = Object.entries(mapObject);
 
     const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     const countriesDistrictsVisited = countriesDistricts.filter(areaData => areaData[1]);
-    const countryScore: number = (countriesDistrictsVisited.length / countriesDistricts.length) * 100;
+    const countryScore: number = Math.round((countriesDistrictsVisited.length / countriesDistricts.length) * 1000) / 1000;
     mapObject[countryCode] = countryScore;
 
     this.setState({ mapObject });
@@ -133,15 +152,23 @@ class Map extends React.Component<OuterProps, AppState> {
   generateMapParameter = (mapObject: IMapObject): string => {
     const hasValueMapArray: Array<any> = Object.entries(mapObject).filter(m => 0 < m[1]);
     const hasValueMapObject = hasValueMapArray.reduce((obj, data) => ({ ...obj, [data[0]]: data[1] }), {});
-    return `?mapGetParam=${encode(JSON.stringify(hasValueMapObject))}`;
+    return `?mapGetParam=${JSON.stringify(hasValueMapObject)}`;
   }
 
-  backHandler = () => {
+  goToTopHandler = () => {
     this.setState({
       region: "world",
       resolution: "",
     });
   };
+
+  goToMiddleRegionHandler = () => {
+    const { region, countryMiddleRegion } = this.state;
+    this.setState({
+      region: region_mapping[countryMiddleRegion[region]],
+      resolution: "",
+    });
+  }
 
   onClickContinentRegionHandler = (continentRegionCode: string) => {
     const region: string = region_mapping[continentRegionCode];
@@ -203,7 +230,6 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   MiddleRegion = (props: MiddleRegionProps) => {
-    const { mapObject } = this.state;
     const {
       middleRegionCode,
       middleRegionCountries,
@@ -217,14 +243,12 @@ class Map extends React.Component<OuterProps, AppState> {
             return null;
           }
           const isDisplay: boolean = this.state.selectedMiddleRegion === middleRegionCode;
-          const displayScore: number = Math.round(mapObject[countryCode] * 100) / 100;
           return (
             <this.Country
               isDisplay={isDisplay}
               countryCode={countryCode}
               countryName={countryName[0]}
               countryNameSub={countryName[1]}
-              countryScore={displayScore}
               key={i}
             />
           );
@@ -239,15 +263,16 @@ class Map extends React.Component<OuterProps, AppState> {
       countryCode,
       countryName,
       countryNameSub,
-      countryScore,
     } = props;
+    const { mapObject } = this.state;
+    const score: number = Math.round(mapObject[countryCode] * 1000) / 10;
     return (
       <CountryWrapper
         onClick={(e) => this.onClickAreaNameHandler(e, countryCode)}
         isDisplay={isDisplay}
       >
         <div>
-          {countryName} ({countryNameSub}): {countryScore}
+          {countryName} ({countryNameSub}): {score}%
         </div>
       </CountryWrapper>
     )
@@ -268,13 +293,11 @@ class Map extends React.Component<OuterProps, AppState> {
           const subdivisionCode = subdivision[0];
           const subdivisionName = subdivision[1][0];
           const subdivisionNameSub = subdivision[1][1];
-          const score: number = mapObject[subdivisionCode]
           return (
             <this.Subdivision
               subdivisionCode={subdivisionCode}
               subdivisionName={subdivisionName}
               subdivisionNameSub={subdivisionNameSub}
-              score={score}
               key={i}
             />
           );
@@ -284,34 +307,34 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   Subdivision = (props: SubdivisionProps) => {
+    const { mapObject } = this.state;
     const {
       subdivisionCode,
       subdivisionName,
       subdivisionNameSub,
-      score
     } = props;
     const displayingSubdivisionNameSub = subdivisionNameSub ? `(${subdivisionNameSub})` : "";
-    const displayingScore = score ? "☑️" : "⬛️";
+    const check = mapObject[subdivisionCode] ? "☑️" : "⬛️";
     return (
       <SubdivisionWrapper
         onClick={(e) => this.onClickAreaNameHandler(e, subdivisionCode)}
       >
         <div>
           <span>{subdivisionCode}: {subdivisionName} {displayingSubdivisionNameSub}</span>
-          <SubdivisionCheck>{displayingScore}</SubdivisionCheck>
+          <SubdivisionCheck>{check}</SubdivisionCheck>
         </div>
       </SubdivisionWrapper>
     )
   };
 
   render() {
-    const { mapObject } = this.state;
+    const { mapObject, region, resolution, countryMiddleRegion } = this.state;
 
-    const mapData = this.transMapData(mapObject);
+    const mapData = this.transMapDataForDisplay(mapObject);
 
     const options = {
-      region: this.state.region,
-      resolution: this.state.resolution,
+      region,
+      resolution,
       legend: "none",
       colorAxis: { colors: ["white", "#EDEDCC", "#CCEDCC"] },
       backgroundColor: "#90C0E0",
@@ -319,6 +342,8 @@ class Map extends React.Component<OuterProps, AppState> {
 
     const mapParameter = this.generateMapParameter(mapObject);
     const url = `${document.domain}/${mapParameter}`;
+
+    const isDisplayCountry = region in countryMiddleRegion;
 
     return (
       <div>
@@ -335,7 +360,8 @@ class Map extends React.Component<OuterProps, AppState> {
           options={options}
           data={mapData}
         />
-        <button onClick={this.backHandler}>Topへ</button>
+        <button onClick={this.goToTopHandler}>Topへ</button>
+        {isDisplayCountry && <button onClick={this.goToMiddleRegionHandler}>上へ</button>}
         <UrlCopy type="text" value={url} readOnly />
         <this.CountriesList />
         <this.SubdivisionList />
@@ -412,14 +438,12 @@ interface CountryProps {
   countryCode: string;
   countryName: string;
   countryNameSub: string;
-  countryScore: number;
 };
 
 interface SubdivisionProps {
   subdivisionCode: string;
   subdivisionName: string;
   subdivisionNameSub: string;
-  score: number;
 };
 
 export default Map;

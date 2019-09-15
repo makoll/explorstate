@@ -1,4 +1,4 @@
-const relations = {
+const relations: { [key: string]: { [key: string]: Array<string> } } = {
   Europe: {
     "Northern Europe": ["GG", "JE", "AX", "DK", "EE", "FI", "FO", "GB", "IE", "IM", "IS", "LT", "LV", "NO", "SE", "SJ"],
     "Western Europe": ["AT", "BE", "CH", "DE", "DD", "FR", "FX", "LI", "LU", "MC", "NL"],
