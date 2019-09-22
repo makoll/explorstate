@@ -343,6 +343,7 @@ class Map extends React.Component<OuterProps, AppState> {
     const mapParameter = this.generateMapParameter(mapObject);
     const url = `${document.domain}/${mapParameter}`;
 
+    const isDisplayWorld = region === "world";
     const isDisplayCountry = region in countryMiddleRegion;
 
     return (
@@ -360,7 +361,7 @@ class Map extends React.Component<OuterProps, AppState> {
           options={options}
           data={mapData}
         />
-        <button onClick={this.goToTopHandler}>Topへ</button>
+        {!isDisplayWorld && <button onClick={this.goToTopHandler}>Topへ</button>}
         {isDisplayCountry && <button onClick={this.goToMiddleRegionHandler}>上へ</button>}
         <UrlCopy type="text" value={url} readOnly />
         <this.CountriesList />
