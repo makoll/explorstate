@@ -348,6 +348,7 @@ class Map extends React.Component<OuterProps, AppState> {
 
     return (
       <div>
+        <img src="img/logo.png" alt="Logo" />
         <Chart
           chartEvents={[
             {
