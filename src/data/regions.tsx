@@ -1,4 +1,4 @@
-const relations: { [key: string]: string } = {
+const regions: { [key: string]: string } = {
   Europe: "150",
   "Northern Europe": "154",
   "Western Europe": "155",
@@ -27,4 +27,4 @@ const relations: { [key: string]: string } = {
   Micronesia: "057",
   Polynesia: "061",
 };
-export default relations;
+export default regions;

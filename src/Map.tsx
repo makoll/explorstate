@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 import countries from "./data/countries";
 import relations from "./data/relations";
-import region_mapping from "./data/region_mapping";
+import regions from "./data/regions";
 // import { decode, encode } from "./util/util";
 
 interface OuterProps {
@@ -165,20 +165,20 @@ class Map extends React.Component<OuterProps, AppState> {
   goToMiddleRegionHandler = () => {
     const { region, countryMiddleRegion } = this.state;
     this.setState({
-      region: region_mapping[countryMiddleRegion[region]],
+      region: regions[countryMiddleRegion[region]],
       resolution: "",
     });
   }
 
   onClickContinentRegionHandler = (continentRegionCode: string) => {
-    const region: string = region_mapping[continentRegionCode];
+    const region: string = regions[continentRegionCode];
     const resolution = "";
     this.setState({ region, resolution });
   };
 
   onClickMiddleRegionHandler = (e: React.MouseEvent, middleRegionCode: string) => {
     const selectedMiddleRegion = middleRegionCode === this.state.selectedMiddleRegion ? "" : middleRegionCode;
-    const region: string = region_mapping[middleRegionCode];
+    const region: string = regions[middleRegionCode];
     const resolution = "";
     this.setState({ selectedMiddleRegion, region, resolution });
     e.stopPropagation();
