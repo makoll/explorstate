@@ -33,7 +33,7 @@
     "react-google-charts": "^3.0.14",
     "react-router-dom": "^5.0.1",
     "styled-components": "^4.3.2",
-    "styled-reset": "^3.0.3"
+    "styled-reset": "^4.0.1"
   },
   "scripts": {
     "start": "yarn webpack-dev-server --mode development",

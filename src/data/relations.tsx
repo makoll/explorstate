@@ -1,9 +1,9 @@
 const relations: { [key: string]: { [key: string]: Array<string> } } = {
-  Europe: {
-    "Northern Europe": ["GG", "JE", "AX", "DK", "EE", "FI", "FO", "GB", "IE", "IM", "IS", "LT", "LV", "NO", "SE", "SJ"],
-    "Western Europe": ["AT", "BE", "CH", "DE", "DD", "FR", "FX", "LI", "LU", "MC", "NL"],
-    "Eastern Europe": ["BG", "BY", "CZ", "HU", "MD", "PL", "RO", "RU", "SU", "SK", "UA"],
-    "Southern Europe": [
+  "150": {
+    "154": ["GG", "JE", "AX", "DK", "EE", "FI", "FO", "GB", "IE", "IM", "IS", "LT", "LV", "NO", "SE", "SJ"],
+    "155": ["AT", "BE", "CH", "DE", "FR", "LI", "LU", "MC", "NL"],
+    "151": ["BG", "BY", "CZ", "HU", "MD", "PL", "RO", "RU", "SK", "UA"],
+    "039": [
       "AD",
       "AL",
       "BA",
@@ -15,22 +15,19 @@ const relations: { [key: string]: { [key: string]: Array<string> } } = {
       "ME",
       "MK",
       "MT",
-      "CS",
       "RS",
       "PT",
       "SI",
       "SM",
       "VA",
       "XK",
-      "YU",
     ],
   },
-  Americas: {
-    "Northern America": ["BM", "CA", "GL", "PM", "US"],
-    Caribbean: [
+  "019": {
+    "021": ["BM", "CA", "GL", "PM", "US"],
+    "029": [
       "AG",
       "AI",
-      "AN",
       "AW",
       "BB",
       "BL",
@@ -55,15 +52,15 @@ const relations: { [key: string]: { [key: string]: Array<string> } } = {
       "VG",
       "VI",
     ],
-    "Central America": ["BZ", "CR", "GT", "HN", "MX", "NI", "PA", "SV"],
-    "South America": ["AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PE", "PY", "SR", "UY", "VE"],
+    "013": ["BZ", "CR", "GT", "HN", "MX", "NI", "PA", "SV"],
+    "005": ["AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PE", "PY", "SR", "UY", "VE"],
   },
-  Asia: {
-    "Central Asia": ["TM", "TJ", "KG", "KZ", "UZ"],
-    "Eastern Asia": ["CN", "HK", "JP", "KP", "KR", "MN", "MO", "TW"],
-    "Southern Asia": ["AF", "BD", "BT", "IN", "IR", "LK", "MV", "NP", "PK"],
-    "South-Eastern Asia": ["BN", "ID", "KH", "LA", "MM", "BU", "MY", "PH", "SG", "TH", "TL", "TP", "VN"],
-    "Western Asia": [
+  "142": {
+    "143": ["TM", "TJ", "KG", "KZ", "UZ"],
+    "030": ["CN", "HK", "JP", "KP", "KR", "MN", "MO", "TW"],
+    "034": ["AF", "BD", "BT", "IN", "IR", "LK", "MV", "NP", "PK"],
+    "035": ["BN", "ID", "KH", "LA", "MM", "MY", "PH", "SG", "TH", "TL", "VN"],
+    "145": [
       "AE",
       "AM",
       "AZ",
@@ -83,12 +80,11 @@ const relations: { [key: string]: { [key: string]: Array<string> } } = {
       "SY",
       "TR",
       "YE",
-      "YD",
     ],
   },
-  Africa: {
-    "Northern Africa": ["DZ", "EG", "EH", "LY", "MA", "SD", "SS", "TN"],
-    "Western Africa": [
+  "002": {
+    "015": ["DZ", "EG", "EH", "LY", "MA", "SD", "SS", "TN"],
+    "011": [
       "BF",
       "BJ",
       "CI",
@@ -107,8 +103,8 @@ const relations: { [key: string]: { [key: string]: Array<string> } } = {
       "SN",
       "TG",
     ],
-    "Middle Africa": ["AO", "CD", "ZR", "CF", "CG", "CM", "GA", "GQ", "ST", "TD"],
-    "Eastern Africa": [
+    "017": ["AO", "CD", "CF", "CG", "CM", "GA", "GQ", "ST", "TD"],
+    "014": [
       "BI",
       "DJ",
       "ER",
@@ -129,13 +125,13 @@ const relations: { [key: string]: { [key: string]: Array<string> } } = {
       "ZM",
       "ZW",
     ],
-    "Southern Africa": ["BW", "LS", "NA", "SZ", "ZA"],
+    "018": ["BW", "LS", "NA", "SZ", "ZA"],
   },
-  Oceania: {
-    "Australia and New Zealand": ["AU", "NF", "NZ"],
-    Melanesia: ["FJ", "NC", "PG", "SB", "VU"],
-    Micronesia: ["FM", "GU", "KI", "MH", "MP", "NR", "PW"],
-    Polynesia: ["AS", "CK", "NU", "PF", "PN", "TK", "TO", "TV", "WF", "WS"],
+  "009": {
+    "053": ["AU", "NF", "NZ"],
+    "054": ["FJ", "NC", "PG", "SB", "VU"],
+    "057": ["FM", "GU", "KI", "MH", "MP", "NR", "PW"],
+    "061": ["AS", "CK", "NU", "PF", "PN", "TK", "TO", "TV", "WF", "WS"],
   },
 };
 export default relations;
