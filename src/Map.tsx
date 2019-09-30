@@ -13,32 +13,28 @@ interface OuterProps {
   location: H.Location;
 }
 
-interface IMapObject {
+interface IRecords {
   [key: string]: number;
 }
 
 interface AppState {
   displayingAreaCode: string;
   resolution: string;
-  mapObject: IMapObject;
-  lastMapData: Array<any>;
+  records: IRecords;
+  lastGoogleChartsData: Array<any>;
   selectedMiddleRegion: string;
   countryMiddleRegion: { [key: string]: string };
 }
 
-const getBlankMapObject = (): IMapObject => {
-  const mapObject = Object.keys(countries).reduce((obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }), {});
-  return mapObject;
+const getInitRecords = (): IRecords => {
+  const records = Object.keys(countries).reduce((obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }), {});
+  return records;
 };
-
-interface MapSelectProps {
-  chartWrapper: any;
-}
 
 class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
-    const mapObject: IMapObject = Object.assign(getBlankMapObject(), this.getParamMapObject());
+    const records: IRecords = Object.assign(getInitRecords(), this.lastParametersRecords());
     const countryMiddleRegion = Object.keys(relations).reduce((o1, continentRegion) => {
       return Object.keys(relations[continentRegion]).reduce((o2, middleRegion) => {
         return relations[continentRegion][middleRegion].reduce((o3, country) => {
@@ -49,21 +45,21 @@ class Map extends React.Component<OuterProps, AppState> {
     this.state = {
       displayingAreaCode: "world",
       resolution: "",
-      mapObject,
-      lastMapData: [],
+      records,
+      lastGoogleChartsData: [],
       selectedMiddleRegion: "",
       countryMiddleRegion,
     };
   }
 
   componentDidMount = () => {
-    const { mapObject } = this.state;
-    const mapData = this.transMapDataForDisplay(mapObject);
-    this.setState({ lastMapData: mapData });
+    const { records } = this.state;
+    const googleChartsData = this.translateGoogleChartsData(records);
+    this.setState({ lastGoogleChartsData: googleChartsData });
   }
 
-  transMapDataForDisplay = (mapObject: IMapObject): Array<any> => {
-    const mapArray = Object.entries(mapObject).map(m => {
+  translateGoogleChartsData = (records: IRecords): Array<any> => {
+    const recordArray = Object.entries(records).map(m => {
       const { displayingAreaCode } = this.state;
       const areaCode = m[0];
       const areaScore = m[1];
@@ -81,18 +77,17 @@ class Map extends React.Component<OuterProps, AppState> {
       }
       return [...m, `${displayAreaName} ${append}`];
     });
-    const mapData = [["Country", "Value", { role: "tooltip", p: { html: true } }], ...mapArray];
-    return mapData;
+    const googleChartsData = [["Country", "Value", { role: "tooltip", p: { html: true } }], ...recordArray];
+    return googleChartsData;
   };
 
-  getParamMapObject = (): IMapObject | null => {
+  lastParametersRecords = (): IRecords | null => {
     const getParams = queryString.parse(this.props.location.search);
-    if (!getParams.mapGetParam) {
+    if (!getParams.records) {
       return null;
     }
-    const cdStr = typeof getParams.mapGetParam === "string" ? getParams.mapGetParam : "";
-    const allDataObject: IMapObject = JSON.parse(cdStr);
-    return allDataObject;
+    const recordString = typeof getParams.records === "string" ? getParams.records : "";
+    return JSON.parse(recordString);
   };
 
   onClickAreaNameHandler = (e: React.MouseEvent, countryCode: string) => {
@@ -100,13 +95,13 @@ class Map extends React.Component<OuterProps, AppState> {
     e.stopPropagation();
   };
 
-  selectCountryOnMapHandler = ({ chartWrapper }: MapSelectProps) => {
-    const { lastMapData } = this.state;
+  selectCountryOnMapHandler = ({ chartWrapper }: any) => {
+    const { lastGoogleChartsData } = this.state;
 
     const chart = chartWrapper.getChart();
     const selection = chart.getSelection();
     const selectedAreaIndex = selection[0].row + 1;
-    const selectedAreaCode = lastMapData[selectedAreaIndex][0];
+    const selectedAreaCode = lastGoogleChartsData[selectedAreaIndex][0];
 
     const { displayingAreaCode } = chartWrapper.getOptions();
     if (displayingAreaCode === "world" || !selectedAreaCode.startsWith(displayingAreaCode)) {
@@ -118,9 +113,9 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   choiseCountry = (countryCode: string) => {
-    const { mapObject } = this.state;
-    const mapArray = Object.entries(mapObject);
-    const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
+    const { records } = this.state;
+    const recordArray = Object.entries(records);
+    const countriesDistricts = recordArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     // 行政区がある場合
     if (0 < countriesDistricts.length) {
       this.setState({
@@ -130,29 +125,29 @@ class Map extends React.Component<OuterProps, AppState> {
       return;
     }
 
-    mapObject[countryCode] = mapObject[countryCode] ? 0 : 1;
-    this.setState({ mapObject });
+    records[countryCode] = records[countryCode] ? 0 : 1;
+    this.setState({ records });
   };
 
   choiseCountryDistrict = (countryDistrictCode: string) => {
-    const { mapObject } = this.state;
-    mapObject[countryDistrictCode] = mapObject[countryDistrictCode] ? 0 : 1;
+    const { records } = this.state;
+    records[countryDistrictCode] = records[countryDistrictCode] ? 0 : 1;
 
     const countryCode: string = countryDistrictCode.split("-")[0];
-    const mapArray = Object.entries(mapObject);
+    const recordArray = Object.entries(records);
 
-    const countriesDistricts = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
+    const countriesDistricts = recordArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     const countriesDistrictsVisited = countriesDistricts.filter(areaData => areaData[1]);
     const countryScore: number = Math.round((countriesDistrictsVisited.length / countriesDistricts.length) * 1000) / 1000;
-    mapObject[countryCode] = countryScore;
+    records[countryCode] = countryScore;
 
-    this.setState({ mapObject });
+    this.setState({ records });
   };
 
-  generateMapParameter = (mapObject: IMapObject): string => {
-    const hasValueMapArray: Array<any> = Object.entries(mapObject).filter(m => 0 < m[1]);
-    const hasValueMapObject = hasValueMapArray.reduce((obj, data) => ({ ...obj, [data[0]]: data[1] }), {});
-    return `?mapGetParam=${JSON.stringify(hasValueMapObject)}`;
+  generateRecordParameter = (records: IRecords): string => {
+    const hasValueRecordArray: Array<any> = Object.entries(records).filter(m => 0 < m[1]);
+    const hasValueRecords = hasValueRecordArray.reduce((obj, data) => ({ ...obj, [data[0]]: data[1] }), {});
+    return `records=${JSON.stringify(hasValueRecords)}`;
   }
 
   goToTopHandler = () => {
@@ -264,8 +259,8 @@ class Map extends React.Component<OuterProps, AppState> {
       countryName,
       countryNameSub,
     } = props;
-    const { mapObject } = this.state;
-    const score: number = Math.round(mapObject[countryCode] * 1000) / 10;
+    const { records } = this.state;
+    const score: number = Math.round(records[countryCode] * 1000) / 10;
     return (
       <CountryWrapper
         onClick={(e) => this.onClickAreaNameHandler(e, countryCode)}
@@ -283,10 +278,9 @@ class Map extends React.Component<OuterProps, AppState> {
     if (!isDisplay) {
       return null;
     }
-    const { mapObject } = this.state;
-    const mapArray = Object.entries(countries);
+    const recordArray = Object.entries(countries);
     const countryCode = this.state.displayingAreaCode;
-    const subdivisions = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
+    const subdivisions = recordArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     return (
       <SubdivisionListWrapper>
         {subdivisions.map((subdivision, i) => {
@@ -307,14 +301,14 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   Subdivision = (props: SubdivisionProps) => {
-    const { mapObject } = this.state;
+    const { records } = this.state;
     const {
       subdivisionCode,
       subdivisionName,
       subdivisionNameSub,
     } = props;
     const displayingSubdivisionNameSub = subdivisionNameSub ? `(${subdivisionNameSub})` : "";
-    const check = mapObject[subdivisionCode] ? "☑️" : "⬛️";
+    const check = records[subdivisionCode] ? "☑️" : "⬛️";
     return (
       <SubdivisionWrapper
         onClick={(e) => this.onClickAreaNameHandler(e, subdivisionCode)}
@@ -328,9 +322,9 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   render() {
-    const { mapObject, displayingAreaCode, resolution, countryMiddleRegion } = this.state;
+    const { records, displayingAreaCode, resolution, countryMiddleRegion } = this.state;
 
-    const mapData = this.transMapDataForDisplay(mapObject);
+    const googleChartsData = this.translateGoogleChartsData(records);
 
     const options = {
       region: displayingAreaCode,
@@ -340,8 +334,8 @@ class Map extends React.Component<OuterProps, AppState> {
       backgroundColor: "#90C0E0",
     };
 
-    const mapParameter = this.generateMapParameter(mapObject);
-    const url = `${document.domain}/${mapParameter}`;
+    const recordParameter = this.generateRecordParameter(records);
+    const url = `${document.domain}?${recordParameter}`;
 
     const isDisplayWorld = displayingAreaCode === "world";
     const isDisplayCountry = displayingAreaCode in countryMiddleRegion;
@@ -360,7 +354,7 @@ class Map extends React.Component<OuterProps, AppState> {
           width="100%"
           height="600px"
           options={options}
-          data={mapData}
+          data={googleChartsData}
         />
         {!isDisplayWorld && <button onClick={this.goToTopHandler}>Topへ</button>}
         {isDisplayCountry && <button onClick={this.goToMiddleRegionHandler}>上へ</button>}
