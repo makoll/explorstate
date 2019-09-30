@@ -18,7 +18,7 @@ interface IMapObject {
 }
 
 interface AppState {
-  region: string;
+  displayingAreaCode: string;
   resolution: string;
   mapObject: IMapObject;
   lastMapData: Array<any>;
@@ -47,7 +47,7 @@ class Map extends React.Component<OuterProps, AppState> {
       }, o1);
     }, {});
     this.state = {
-      region: "world",
+      displayingAreaCode: "world",
       resolution: "",
       mapObject,
       lastMapData: [],
@@ -64,7 +64,7 @@ class Map extends React.Component<OuterProps, AppState> {
 
   transMapDataForDisplay = (mapObject: IMapObject): Array<any> => {
     const mapArray = Object.entries(mapObject).map(m => {
-      const { region } = this.state;
+      const { displayingAreaCode } = this.state;
       const areaCode = m[0];
       const areaScore = m[1];
       const areaName = countries[areaCode][0];
@@ -72,7 +72,7 @@ class Map extends React.Component<OuterProps, AppState> {
       const displayAreaNameSub = areaNameSub ? ` (${areaNameSub})` : "";
       const displayAreaName = `${areaName}${displayAreaNameSub}`;
       let append = null;
-      if (region === "world" || !areaCode.startsWith(region)) {
+      if (displayingAreaCode === "world" || !areaCode.startsWith(displayingAreaCode)) {
         const score: number = Math.round(areaScore * 1000) / 10;
         append = `${score}%`;
       } else {
@@ -108,8 +108,8 @@ class Map extends React.Component<OuterProps, AppState> {
     const selectedAreaIndex = selection[0].row + 1;
     const selectedAreaCode = lastMapData[selectedAreaIndex][0];
 
-    const { region } = chartWrapper.getOptions();
-    if (region === "world" || !selectedAreaCode.startsWith(region)) {
+    const { displayingAreaCode } = chartWrapper.getOptions();
+    if (displayingAreaCode === "world" || !selectedAreaCode.startsWith(displayingAreaCode)) {
       this.choiseCountry(selectedAreaCode);
       return;
     }
@@ -124,7 +124,7 @@ class Map extends React.Component<OuterProps, AppState> {
     // 行政区がある場合
     if (0 < countriesDistricts.length) {
       this.setState({
-        region: countryCode,
+        displayingAreaCode: countryCode,
         resolution: "provinces",
       });
       return;
@@ -157,35 +157,35 @@ class Map extends React.Component<OuterProps, AppState> {
 
   goToTopHandler = () => {
     this.setState({
-      region: "world",
+      displayingAreaCode: "world",
       resolution: "",
     });
   };
 
   goToMiddleRegionHandler = () => {
-    const { region, countryMiddleRegion } = this.state;
+    const { displayingAreaCode, countryMiddleRegion } = this.state;
     this.setState({
-      region: regions[countryMiddleRegion[region]],
+      displayingAreaCode: regions[countryMiddleRegion[displayingAreaCode]],
       resolution: "",
     });
   }
 
   onClickContinentRegionHandler = (continentRegionCode: string) => {
-    const region: string = regions[continentRegionCode];
+    const displayingAreaCode: string = regions[continentRegionCode];
     const resolution = "";
-    this.setState({ region, resolution });
+    this.setState({ displayingAreaCode, resolution });
   };
 
   onClickMiddleRegionHandler = (e: React.MouseEvent, middleRegionCode: string) => {
     const selectedMiddleRegion = middleRegionCode === this.state.selectedMiddleRegion ? "" : middleRegionCode;
-    const region: string = regions[middleRegionCode];
+    const displayingAreaCode: string = regions[middleRegionCode];
     const resolution = "";
-    this.setState({ selectedMiddleRegion, region, resolution });
+    this.setState({ selectedMiddleRegion, displayingAreaCode, resolution });
     e.stopPropagation();
   };
 
   CountriesList = () => {
-    const isDisplay: boolean = !(this.state.region in countries);
+    const isDisplay: boolean = !(this.state.displayingAreaCode in countries);
     if (!isDisplay) {
       return null;
     }
@@ -279,13 +279,13 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   SubdivisionList = () => {
-    const isDisplay: boolean = this.state.region in countries;
+    const isDisplay: boolean = this.state.displayingAreaCode in countries;
     if (!isDisplay) {
       return null;
     }
     const { mapObject } = this.state;
     const mapArray = Object.entries(countries);
-    const countryCode = this.state.region;
+    const countryCode = this.state.displayingAreaCode;
     const subdivisions = mapArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     return (
       <SubdivisionListWrapper>
@@ -328,12 +328,12 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   render() {
-    const { mapObject, region, resolution, countryMiddleRegion } = this.state;
+    const { mapObject, displayingAreaCode, resolution, countryMiddleRegion } = this.state;
 
     const mapData = this.transMapDataForDisplay(mapObject);
 
     const options = {
-      region,
+      region: displayingAreaCode,
       resolution,
       legend: "none",
       colorAxis: { colors: ["white", "#EDEDCC", "#CCEDCC"] },
@@ -343,8 +343,8 @@ class Map extends React.Component<OuterProps, AppState> {
     const mapParameter = this.generateMapParameter(mapObject);
     const url = `${document.domain}/${mapParameter}`;
 
-    const isDisplayWorld = region === "world";
-    const isDisplayCountry = region in countryMiddleRegion;
+    const isDisplayWorld = displayingAreaCode === "world";
+    const isDisplayCountry = displayingAreaCode in countryMiddleRegion;
 
     return (
       <div>
