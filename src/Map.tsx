@@ -450,7 +450,7 @@ const SubdivisionSelectorWrapper = styled(AreaSelectorButton)`
 `;
 
 const SubdivisionSelectorListWrapper = styled.div`
-  height: ${window.innerHeight - 143}px;
+  height: ${window.innerHeight - 90}px;
   overflow: scroll;
 `;
 
