@@ -3,6 +3,7 @@ import * as queryString from "query-string";
 import * as H from "history";
 import Chart from "react-google-charts";
 import styled from "styled-components";
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from "lz-string";
 
 import countries from "./data/countries";
 import relations from "./data/relations";
@@ -55,25 +56,25 @@ class Map extends React.Component<OuterProps, AppState> {
     const countrySecondaryRegionMap = Object.keys(relations).reduce((o1, primaryRegion) => {
       return Object.keys(relations[primaryRegion]).reduce((o2, secondaryRegion) => {
         return relations[primaryRegion][secondaryRegion].reduce((o3, country) => {
-          return Object.assign(o3, { [country]: secondaryRegion })
-        }, o2)
+          return Object.assign(o3, { [country]: secondaryRegion });
+        }, o2);
       }, o1);
     }, {});
-    return countrySecondaryRegionMap
-  }
+    return countrySecondaryRegionMap;
+  };
 
   generateCountriesSubdivision = (countryCode: string) => {
     const { records } = this.state;
     const recordArray = Object.entries(records);
     const countriesSubdivision = recordArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     return countriesSubdivision;
-  }
+  };
 
   componentDidMount = () => {
     const { records } = this.state;
     const googleChartsData = this.translateGoogleChartsData(records);
     this.setState({ lastGoogleChartsData: googleChartsData });
-  }
+  };
 
   translateGoogleChartsData = (records: IRecords): Array<any> => {
     const googleChartsDataNoHeader = Object.entries(records).map(record => {
@@ -94,19 +95,39 @@ class Map extends React.Component<OuterProps, AppState> {
       }
       return [...record, `${displayAreaName} ${append}`];
     });
-    const googleChartsData =
-      [["Country", "Value", { role: "tooltip", p: { html: true } }], ...googleChartsDataNoHeader];
+    const googleChartsData = [
+      ["Country", "Value", { role: "tooltip", p: { html: true } }],
+      ...googleChartsDataNoHeader,
+    ];
     return googleChartsData;
   };
 
   getParametersLastRecords = (): IRecords | null => {
     const getParams = queryString.parse(this.props.location.search);
-    if (!getParams.records) {
+    if (!getParams.records || getParams.records instanceof Array) {
       return null;
     }
-    const recordsString = typeof getParams.records === "string" ? getParams.records : "";
-    const records = JSON.parse(recordsString);
-    return records
+    const paramsRecords: string = getParams.records;
+    const records = this.decompressRecords(paramsRecords);
+    return records;
+  };
+
+  decompressRecords = (compressed: string): IRecords => {
+    const recordsString = decompressFromEncodedURIComponent(compressed);
+    const countryDataArray = recordsString.split(";");
+    const records = countryDataArray.reduce((o: IRecords, c) => {
+      const splittedCompnayAndSubdivision = c.split(":");
+      const countryCode = splittedCompnayAndSubdivision[0];
+      const subdivisionCodesWithoutCountryCode = splittedCompnayAndSubdivision[1].split(",");
+      const subdivisionRecords = subdivisionCodesWithoutCountryCode.reduce(
+        (tmpSubdivisonRecords, subdivisionCodeWithoutCountryCode) => {
+          return Object.assign(tmpSubdivisonRecords, { [`${countryCode}-${subdivisionCodeWithoutCountryCode}`]: 1 });
+        },
+        {}
+      );
+      return Object.assign(o, subdivisionRecords);
+    }, {});
+    return records;
   };
 
   selectAreaOnMapHandler = ({ chartWrapper }: any) => {
@@ -127,10 +148,34 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   generateRecordsParameter = (records: IRecords): string => {
-    const hasValueRecordsArray: Array<any> = Object.entries(records).filter(m => 0 < m[1]);
-    const hasValueRecords = hasValueRecordsArray.reduce((obj, data) => ({ ...obj, [data[0]]: data[1] }), {});
-    return `records=${JSON.stringify(hasValueRecords)}`;
-  }
+    const recordParams = this.compressRecords(records);
+    return `records=${recordParams}`;
+  };
+
+  compressRecords = (records: IRecords): string => {
+    const visitedSubdivisionCodes = Object.keys(records).filter(subdivisionCode => {
+      return subdivisionCode.length !== 2 && records[subdivisionCode] === 1;
+    });
+    // {countryCode: [subdivisionCode]}のフォーマットに
+    // subdivisionCodeからはcountryCodeを除く
+    const changedFormat = visitedSubdivisionCodes.reduce((o: { [key: string]: Array<string> }, subdivisionCode) => {
+      const splitedSubdivisionCode = subdivisionCode.split("-");
+      const countryCode = splitedSubdivisionCode[0];
+      const existed = countryCode in o ? o[countryCode] : [];
+      existed.push(splitedSubdivisionCode[1]);
+      return Object.assign(o, { [countryCode]: existed });
+    }, {});
+
+    // countryCode(CC),subdivisionCode(SC)を、CC:SC,SC;CC:SC,SC;...のフォーマットの文字列に変換
+    let formatted = Object.keys(changedFormat).reduce((s, countryCode) => {
+      const countriesFormatted = `${countryCode}:${changedFormat[countryCode].join(",")};`;
+      return `${s}${countriesFormatted}`;
+    }, "");
+    formatted = formatted.replace(/;$/g, "");
+
+    const compressed = compressToEncodedURIComponent(formatted);
+    return compressed;
+  };
 
   goToWorldHandler = () => {
     this.setState({
@@ -195,136 +240,113 @@ class Map extends React.Component<OuterProps, AppState> {
     this.setState({ records });
   };
 
-  WorldSelector = () =>
+  WorldSelector = () => (
     <WorldSelectorWrapper onClick={this.goToWorldHandler}>
       <div>WORLD</div>
-    </WorldSelectorWrapper>;
+    </WorldSelectorWrapper>
+  );
 
   PrimaryRegionSelector = (props: primaryRegionSelectorProps) => {
-    const {
-      primaryRegionCode,
-    } = props;
+    const { primaryRegionCode } = props;
     return (
       <PrimaryRegionSelectorWrapper onClick={() => this.onClickPrimaryRegionHandler(primaryRegionCode)}>
         <div>{regions[primaryRegionCode]}</div>
       </PrimaryRegionSelectorWrapper>
-    )
+    );
   };
 
   SecondaryRegionSelector = (props: SecondaryRegionSelectorProps) => {
-    const {
-      secondaryRegionCode,
-    } = props;
+    const { secondaryRegionCode } = props;
     return (
       <SecondaryRegionSelectorWrapper onClick={() => this.onClickSecondaryRegionHandler(secondaryRegionCode)}>
         <div>{regions[secondaryRegionCode]}</div>
       </SecondaryRegionSelectorWrapper>
-    )
+    );
   };
 
   CountrySelector = (props: CountrySelectorProps) => {
-    const {
-      countryCode,
-    } = props;
+    const { countryCode } = props;
     const countryName = countries[countryCode][0];
     const countryNameSub = countries[countryCode][1];
     const { records } = this.state;
     const score: number = Math.round(records[countryCode] * 1000) / 10;
     return (
-      <CountrySelectorWrapper
-        onClick={() => this.onClickCountryHandler(countryCode)}
-      >
+      <CountrySelectorWrapper onClick={() => this.onClickCountryHandler(countryCode)}>
         <div>
           {countryName} ({countryNameSub}): {score}%
         </div>
       </CountrySelectorWrapper>
-    )
+    );
   };
 
   SubdivisionSelector = (props: SubdivisionSelectorProps) => {
     const { records } = this.state;
-    const {
-      subdivisionCode,
-      subdivisionName,
-      subdivisionNameSub,
-    } = props;
+    const { subdivisionCode, subdivisionName, subdivisionNameSub } = props;
     const displayingSubdivisionNameSub = subdivisionNameSub ? `(${subdivisionNameSub})` : "";
     const check = records[subdivisionCode] ? "☑️" : "⬛️";
     return (
-      <SubdivisionSelectorWrapper
-        onClick={() => this.onClickCountryHandler(subdivisionCode)}
-      >
+      <SubdivisionSelectorWrapper onClick={() => this.onClickCountryHandler(subdivisionCode)}>
         <div>
-          <span>{subdivisionCode}: {subdivisionName} {displayingSubdivisionNameSub}</span>
+          <span>
+            {subdivisionCode}: {subdivisionName} {displayingSubdivisionNameSub}
+          </span>
           <SubdivisionCheck>{check}</SubdivisionCheck>
         </div>
       </SubdivisionSelectorWrapper>
-    )
+    );
   };
 
   PrimaryRegionSelectorList = () => {
     return (
       <div>
         {Object.keys(relations).map((primaryRegionCode, i) => {
-          const isDisplay: boolean = AREA_CODE_WORLD === this.state.displayingAreaCode
-            || primaryRegionCode === this.state.selectedPrimaryRegionCode;
+          const isDisplay: boolean =
+            AREA_CODE_WORLD === this.state.displayingAreaCode ||
+            primaryRegionCode === this.state.selectedPrimaryRegionCode;
           if (isDisplay) {
-            return (
-              <this.PrimaryRegionSelector
-                primaryRegionCode={primaryRegionCode}
-                key={i}
-              />
-            );
+            return <this.PrimaryRegionSelector primaryRegionCode={primaryRegionCode} key={i} />;
           }
         })}
       </div>
-    )
+    );
   };
 
   SecondaryRegionSelectorList = () => {
-    if (!(this.state.selectedPrimaryRegionCode)) {
+    if (!this.state.selectedPrimaryRegionCode) {
       return null;
     }
     const secondaryRegions = relations[this.state.selectedPrimaryRegionCode];
     return (
       <div>
         {Object.keys(secondaryRegions).map((secondaryRegionCode, i) => {
-          const isDisplay: boolean = this.state.displayingAreaCode in relations
-            || secondaryRegionCode === this.state.selectedSecondaryRegionCode;
+          const isDisplay: boolean =
+            this.state.displayingAreaCode in relations ||
+            secondaryRegionCode === this.state.selectedSecondaryRegionCode;
           if (isDisplay) {
-            return (
-              <this.SecondaryRegionSelector
-                secondaryRegionCode={secondaryRegionCode}
-                key={i}
-              />
-            );
+            return <this.SecondaryRegionSelector secondaryRegionCode={secondaryRegionCode} key={i} />;
           }
         })}
       </div>
-    )
+    );
   };
 
   CountrySelectorList = () => {
-    if (!(this.state.selectedSecondaryRegionCode)) {
+    if (!this.state.selectedSecondaryRegionCode) {
       return null;
     }
     const _countries = relations[this.state.selectedPrimaryRegionCode][this.state.selectedSecondaryRegionCode];
     return (
       <div>
         {_countries.map((countryCode, i) => {
-          const isDisplay: boolean = this.state.displayingAreaCode in relations[this.state.selectedPrimaryRegionCode]
-            || countryCode === this.state.selectedCountryCode;
+          const isDisplay: boolean =
+            this.state.displayingAreaCode in relations[this.state.selectedPrimaryRegionCode] ||
+            countryCode === this.state.selectedCountryCode;
           if (isDisplay) {
-            return (
-              <this.CountrySelector
-                countryCode={countryCode}
-                key={i}
-              />
-            );
+            return <this.CountrySelector countryCode={countryCode} key={i} />;
           }
         })}
       </div>
-    )
+    );
   };
 
   SubdivisionSelectorList = () => {
@@ -351,7 +373,7 @@ class Map extends React.Component<OuterProps, AppState> {
           );
         })}
       </SubdivisionSelectorListWrapper>
-    )
+    );
   };
 
   render() {
@@ -405,16 +427,13 @@ class Map extends React.Component<OuterProps, AppState> {
 
 const TopContainer = styled.div`
   display: flex;
-`
+`;
 
-const MapContainer = styled.div`
-`
+const MapContainer = styled.div``;
 
-const ControllerContainer = styled.div`
-`
+const ControllerContainer = styled.div``;
 
-const AreaListContainer = styled.div`
-`
+const AreaListContainer = styled.div``;
 
 const AreaSelectorButton = styled.div`
   width: 300px;
@@ -472,12 +491,12 @@ interface SecondaryRegionSelectorProps {
 
 interface CountrySelectorProps {
   countryCode: string;
-};
+}
 
 interface SubdivisionSelectorProps {
   subdivisionCode: string;
   subdivisionName: string;
   subdivisionNameSub: string;
-};
+}
 
 export default Map;
