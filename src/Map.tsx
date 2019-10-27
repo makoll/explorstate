@@ -27,6 +27,7 @@ interface AppState {
   selectedPrimaryRegionCode: string;
   selectedSecondaryRegionCode: string;
   selectedCountryCode: string;
+  secondaryRegionPrimaryRegionMap: { [key: string]: string };
   countrySecondaryRegionMap: { [key: string]: string };
 }
 
@@ -39,6 +40,7 @@ class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
     const records: IRecords = Object.assign(getInitRecords(), this.getParametersLastRecords());
+    const secondaryRegionPrimaryRegionMap = this.generateSecondaryRegionPrimaryRegionMap();
     const countrySecondaryRegionMap = this.generateCountrySecondaryRegionMap();
     this.state = {
       displayingAreaCode: AREA_CODE_WORLD,
@@ -48,11 +50,21 @@ class Map extends React.Component<OuterProps, AppState> {
       selectedPrimaryRegionCode: "",
       selectedSecondaryRegionCode: "",
       selectedCountryCode: "",
+      secondaryRegionPrimaryRegionMap,
       countrySecondaryRegionMap,
     };
     const countryCodes = Object.keys(countries).filter(countryCode => countryCode.length === 2);
     countryCodes.map(countryCode => this.recalculationCountryScore(countryCode));
   }
+
+  generateSecondaryRegionPrimaryRegionMap = () => {
+    const secondaryRegionPrimaryRegionMap = Object.keys(relations).reduce((o1, primaryRegion) => {
+      return Object.keys(relations[primaryRegion]).reduce((o2, secondaryRegion) => {
+        return Object.assign(o2, { [secondaryRegion]: primaryRegion });
+      }, o1);
+    }, {});
+    return secondaryRegionPrimaryRegionMap;
+  };
 
   generateCountrySecondaryRegionMap = () => {
     const countrySecondaryRegionMap = Object.keys(relations).reduce((o1, primaryRegion) => {
@@ -133,7 +145,12 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   selectAreaOnMapHandler = ({ chartWrapper }: any) => {
-    const { lastGoogleChartsData, displayingAreaCode } = this.state;
+    const {
+      lastGoogleChartsData,
+      displayingAreaCode,
+      secondaryRegionPrimaryRegionMap,
+      countrySecondaryRegionMap,
+    } = this.state;
 
     const chart = chartWrapper.getChart();
     const selection = chart.getSelection();
@@ -142,6 +159,11 @@ class Map extends React.Component<OuterProps, AppState> {
 
     if (displayingAreaCode === AREA_CODE_WORLD || !selectedAreaCode.startsWith(displayingAreaCode)) {
       this.choiseCountry(selectedAreaCode);
+      const secondaryRegionCode = countrySecondaryRegionMap[selectedAreaCode];
+      this.setState({
+        selectedPrimaryRegionCode: secondaryRegionPrimaryRegionMap[secondaryRegionCode],
+        selectedSecondaryRegionCode: secondaryRegionCode,
+      });
       return;
     }
 
@@ -198,10 +220,10 @@ class Map extends React.Component<OuterProps, AppState> {
     });
   };
 
-  onClickSecondaryRegionHandler = (SecondaryRegionCode: string) => {
+  onClickSecondaryRegionHandler = (secondaryRegionCode: string) => {
     this.setState({
-      displayingAreaCode: SecondaryRegionCode,
-      selectedSecondaryRegionCode: SecondaryRegionCode,
+      displayingAreaCode: secondaryRegionCode,
+      selectedSecondaryRegionCode: secondaryRegionCode,
       resolution: "",
     });
   };
@@ -388,7 +410,7 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   render() {
-    const { records, displayingAreaCode, resolution, countrySecondaryRegionMap } = this.state;
+    const { records, displayingAreaCode, resolution } = this.state;
 
     const googleChartsData = this.translateGoogleChartsData(records);
 
