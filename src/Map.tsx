@@ -50,6 +50,8 @@ class Map extends React.Component<OuterProps, AppState> {
       selectedCountryCode: "",
       countrySecondaryRegionMap,
     };
+    const countryCodes = Object.keys(countries).filter(countryCode => countryCode.length === 2);
+    countryCodes.map(countryCode => this.recalculationCountryScore(countryCode));
   }
 
   generateCountrySecondaryRegionMap = () => {
@@ -131,14 +133,13 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   selectAreaOnMapHandler = ({ chartWrapper }: any) => {
-    const { lastGoogleChartsData } = this.state;
+    const { lastGoogleChartsData, displayingAreaCode } = this.state;
 
     const chart = chartWrapper.getChart();
     const selection = chart.getSelection();
     const selectedAreaIndex = selection[0].row + 1;
     const selectedAreaCode = lastGoogleChartsData[selectedAreaIndex][0];
 
-    const { displayingAreaCode } = chartWrapper.getOptions();
     if (displayingAreaCode === AREA_CODE_WORLD || !selectedAreaCode.startsWith(displayingAreaCode)) {
       this.choiseCountry(selectedAreaCode);
       return;
@@ -226,15 +227,25 @@ class Map extends React.Component<OuterProps, AppState> {
     this.setState({ records });
   };
 
+  onClickSubdivisionHandler = (subdivisionCode: string) => {
+    this.choiseSubdivision(subdivisionCode);
+  };
+
   choiseSubdivision = (subdivisionCode: string) => {
     const { records } = this.state;
     records[subdivisionCode] = records[subdivisionCode] ? 0 : 1;
+    this.setState({ records });
 
     const countryCode: string = subdivisionCode.split("-")[0];
+    this.recalculationCountryScore(countryCode);
+  };
+
+  recalculationCountryScore = (countryCode: string) => {
+    const { records } = this.state;
     const countriesSubdivisions = this.generateCountriesSubdivision(countryCode);
     const visitedCountriesSubdivisions = countriesSubdivisions.filter(areaData => areaData[1]);
     const countryScore: number =
-      Math.round((visitedCountriesSubdivisions.length / countriesSubdivisions.length) * 1000) / 1000;
+      Math.round((visitedCountriesSubdivisions.length / countriesSubdivisions.length) * 1000) / 1000 || 0;
     records[countryCode] = countryScore;
 
     this.setState({ records });
@@ -285,7 +296,7 @@ class Map extends React.Component<OuterProps, AppState> {
     const displayingSubdivisionNameSub = subdivisionNameSub ? `(${subdivisionNameSub})` : "";
     const check = records[subdivisionCode] ? "☑️" : "⬛️";
     return (
-      <SubdivisionSelectorWrapper onClick={() => this.onClickCountryHandler(subdivisionCode)}>
+      <SubdivisionSelectorWrapper onClick={() => this.onClickSubdivisionHandler(subdivisionCode)}>
         <div>
           <span>
             {subdivisionCode}: {subdivisionName} {displayingSubdivisionNameSub}
