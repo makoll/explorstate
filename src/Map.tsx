@@ -181,13 +181,14 @@ class Map extends React.Component<OuterProps, AppState> {
     });
     // {countryCode: [subdivisionCode]}のフォーマットに
     // subdivisionCodeからはcountryCodeを除く
+    const changedFormatBase: { [index: string]: any } = {};
     const changedFormat = visitedSubdivisionCodes.reduce((o: { [key: string]: Array<string> }, subdivisionCode) => {
       const splitedSubdivisionCode = subdivisionCode.split("-");
       const countryCode = splitedSubdivisionCode[0];
       const existed = countryCode in o ? o[countryCode] : [];
       existed.push(splitedSubdivisionCode[1]);
       return Object.assign(o, { [countryCode]: existed });
-    }, {});
+    }, changedFormatBase);
 
     // countryCode(CC),subdivisionCode(SC)を、CC:SC,SC;CC:SC,SC;...のフォーマットの文字列に変換
     let formatted = Object.keys(changedFormat).reduce((s, countryCode) => {
