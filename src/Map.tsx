@@ -317,13 +317,27 @@ class Map extends React.Component<OuterProps, AppState> {
     const { countryCode } = props;
     const countryName = countries[countryCode][0];
     const countryNameSub = countries[countryCode][1];
+    const countriesArray = Object.entries(countries);
+    const subdivisions = countriesArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
     const { records } = this.state;
+    if (0 === subdivisions.length) {
+      const check = records[countryCode] ? "☑️" : "⬛️";
+      return (
+        <CountrySelectorWrapper onClick={() => this.onClickCountryHandler(countryCode)}>
+          <span>
+            {countryName} ({countryNameSub})
+          </span>
+          <AreaCheck>{check}</AreaCheck>
+        </CountrySelectorWrapper>
+      );
+    }
     const score: number = Math.round(records[countryCode] * 1000) / 10;
     return (
       <CountrySelectorWrapper onClick={() => this.onClickCountryHandler(countryCode)}>
-        <div>
-          {countryName} ({countryNameSub}): {score}%
-        </div>
+        <span>
+          {countryName} ({countryNameSub})
+        </span>
+        <AreaScore>{score}%</AreaScore>
       </CountrySelectorWrapper>
     );
   };
@@ -339,7 +353,7 @@ class Map extends React.Component<OuterProps, AppState> {
           <span>
             {subdivisionCode}: {subdivisionName} {displayingSubdivisionNameSub}
           </span>
-          <SubdivisionCheck>{check}</SubdivisionCheck>
+          <AreaCheck>{check}</AreaCheck>
         </div>
       </SubdivisionSelectorWrapper>
     );
@@ -530,7 +544,11 @@ const UrlCopy = styled.input`
   width: 296px;
 `;
 
-const SubdivisionCheck = styled.span`
+const AreaCheck = styled.span`
+  float: right;
+`;
+
+const AreaScore = styled.span`
   float: right;
 `;
 
