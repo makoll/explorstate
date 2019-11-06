@@ -315,7 +315,6 @@ class Map extends React.Component<OuterProps, AppState> {
 
   CountrySelector = (props: CountrySelectorProps) => {
     const { countryCode } = props;
-    console.log(countryCode);
     const countryName = countries[countryCode][0];
     const countryNameSub = countries[countryCode][1];
     const { records } = this.state;
