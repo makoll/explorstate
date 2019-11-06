@@ -212,9 +212,13 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   onClickPrimaryRegionHandler = (primaryRegionCode: string) => {
+    const displayingAreaCode =
+      primaryRegionCode === this.state.selectedPrimaryRegionCode ? AREA_CODE_WORLD : primaryRegionCode;
+    const selectedPrimaryRegionCode =
+      primaryRegionCode === this.state.selectedPrimaryRegionCode ? "" : primaryRegionCode;
     this.setState({
-      displayingAreaCode: primaryRegionCode,
-      selectedPrimaryRegionCode: primaryRegionCode,
+      displayingAreaCode,
+      selectedPrimaryRegionCode,
       selectedSecondaryRegionCode: "",
       selectedCountryCode: "",
       resolution: "",
@@ -222,9 +226,16 @@ class Map extends React.Component<OuterProps, AppState> {
   };
 
   onClickSecondaryRegionHandler = (secondaryRegionCode: string) => {
+    const displayingAreaCode =
+      secondaryRegionCode === this.state.selectedSecondaryRegionCode
+        ? this.state.selectedPrimaryRegionCode
+        : secondaryRegionCode;
+    const selectedSecondaryRegionCode =
+      secondaryRegionCode === this.state.selectedSecondaryRegionCode ? "" : secondaryRegionCode;
     this.setState({
-      displayingAreaCode: secondaryRegionCode,
-      selectedSecondaryRegionCode: secondaryRegionCode,
+      displayingAreaCode,
+      selectedSecondaryRegionCode,
+      selectedCountryCode: "",
       resolution: "",
     });
   };
@@ -238,10 +249,14 @@ class Map extends React.Component<OuterProps, AppState> {
     const countriesSubdivisions = this.generateCountriesSubdivision(countryCode);
     // 行政区がある場合
     if (0 < countriesSubdivisions.length) {
+      const displayingAreaCode =
+        countryCode === this.state.selectedCountryCode ? this.state.selectedSecondaryRegionCode : countryCode;
+      const selectedCountryCode = countryCode === this.state.selectedCountryCode ? "" : countryCode;
+      const resolution = countryCode === this.state.selectedCountryCode ? "" : "provinces";
       this.setState({
-        displayingAreaCode: countryCode,
-        selectedCountryCode: countryCode,
-        resolution: "provinces",
+        displayingAreaCode,
+        selectedCountryCode,
+        resolution,
       });
       return;
     }
@@ -300,6 +315,7 @@ class Map extends React.Component<OuterProps, AppState> {
 
   CountrySelector = (props: CountrySelectorProps) => {
     const { countryCode } = props;
+    console.log(countryCode);
     const countryName = countries[countryCode][0];
     const countryNameSub = countries[countryCode][1];
     const { records } = this.state;
