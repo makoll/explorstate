@@ -487,6 +487,10 @@ const AreaListContainer = styled.div``;
 const AreaSelectorButton = styled.div`
   width: 300px;
   cursor: pointer;
+
+  &:hover {
+    font-weight: bold;
+  }
 `;
 
 const WorldSelectorWrapper = styled(AreaSelectorButton)`
