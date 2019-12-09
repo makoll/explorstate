@@ -477,11 +477,22 @@ class Map extends React.Component<OuterProps, AppState> {
               },
             ]}
             chartType="GeoChart"
-            height={`${window.innerHeight}px`}
+            height={`${window.innerHeight - 30}px`}
             width={`${window.innerWidth - 300}px`}
             options={options}
             data={googleChartsData}
           />
+          <LinkBox>
+            <Link href="about.html" target="_blank">
+              About
+            </Link>
+            <Link href="https://github.com/makoll" target="_blank">
+              Contact
+            </Link>
+            <Link href="https://github.com/makoll/explorstate" target="_blank">
+              Github
+            </Link>
+          </LinkBox>
         </MapContainer>
       </TopContainer>
     );
@@ -550,6 +561,33 @@ const AreaCheck = styled.span`
 
 const AreaScore = styled.span`
   float: right;
+`;
+
+const LinkBox = styled.div`
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+`;
+
+const Link = styled.a`
+  color: rgb(95, 99, 104);
+  cursor: pointer;
+  display: inline;
+  font-family: arial, sans-serif;
+  font-size: 14px;
+  height: auto;
+  line-height: 30px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  text-decoration-color: rgb(95, 99, 104);
+  text-decoration-line: none;
+  text-decoration-style: solid;
+  visibility: visible;
+  white-space: nowrap;
+  width: auto;
 `;
 
 interface primaryRegionSelectorProps {
