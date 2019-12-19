@@ -448,7 +448,7 @@ class Map extends React.Component<OuterProps, AppState> {
       region: displayingAreaCode,
       resolution,
       legend: "none",
-      colorAxis: { colors: ["white", "#EDEDCC", "#CCEDCC"] },
+      colorAxis: { colors: ["white", "#DBFFDB", "#CCEDD2", "#CCEDCC", "#93ED93"] },
       backgroundColor: "#90C0E0",
     };
 
