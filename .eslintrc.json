@@ -38,7 +38,10 @@
         "trailingComma": "all",
         "jsxSingleQuote": true
       }
-    ]
+    ],
+    "quotes": [{
+      "avoidEscape": false
+    }]
   },
   "parser": "@typescript-eslint/parser",
   "settings": {

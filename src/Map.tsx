@@ -15,14 +15,14 @@ interface OuterProps {
   location: H.Location;
 }
 
-interface IRecords {
+interface Records {
   [key: string]: number;
 }
 
 interface AppState {
   displayingAreaCode: string;
   resolution: string;
-  records: IRecords;
+  records: Records;
   lastGoogleChartsData: Array<any>;
   selectedPrimaryRegionCode: string;
   selectedSecondaryRegionCode: string;
@@ -31,7 +31,7 @@ interface AppState {
   countrySecondaryRegionMap: { [key: string]: string };
 }
 
-const getInitRecords = (): IRecords => {
+const getInitRecords = (): Records => {
   const records = Object.keys(countries).reduce((obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }), {});
   return records;
 };
@@ -39,7 +39,7 @@ const getInitRecords = (): IRecords => {
 class Map extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
-    const records: IRecords = Object.assign(getInitRecords(), this.getParametersLastRecords());
+    const records: Records = Object.assign(getInitRecords(), this.getParametersLastRecords());
     const secondaryRegionPrimaryRegionMap = this.generateSecondaryRegionPrimaryRegionMap();
     const countrySecondaryRegionMap = this.generateCountrySecondaryRegionMap();
     this.state = {
@@ -90,7 +90,7 @@ class Map extends React.Component<OuterProps, AppState> {
     this.setState({ lastGoogleChartsData: googleChartsData });
   };
 
-  translateGoogleChartsData = (records: IRecords): Array<any> => {
+  translateGoogleChartsData = (records: Records): Array<any> => {
     const googleChartsDataNoHeader = Object.entries(records).map(record => {
       const { displayingAreaCode } = this.state;
       const areaCode = record[0];
@@ -116,7 +116,7 @@ class Map extends React.Component<OuterProps, AppState> {
     return googleChartsData;
   };
 
-  getParametersLastRecords = (): IRecords | null => {
+  getParametersLastRecords = (): Records | null => {
     const getParams = queryString.parse(this.props.location.search);
     if (!getParams.records || getParams.records instanceof Array) {
       return null;
@@ -126,10 +126,10 @@ class Map extends React.Component<OuterProps, AppState> {
     return records;
   };
 
-  decompressRecords = (compressed: string): IRecords => {
+  decompressRecords = (compressed: string): Records => {
     const recordsString = decompressFromEncodedURIComponent(compressed);
     const countryDataArray = recordsString.split(';');
-    const records = countryDataArray.reduce((o: IRecords, c) => {
+    const records = countryDataArray.reduce((o: Records, c) => {
       const splittedCompnayAndSubdivision = c.split(':');
       const countryCode = splittedCompnayAndSubdivision[0];
       const subdivisionCodesWithoutCountryCode = splittedCompnayAndSubdivision[1].split(',');
@@ -170,12 +170,12 @@ class Map extends React.Component<OuterProps, AppState> {
     this.choiseSubdivision(selectedAreaCode);
   };
 
-  generateRecordsParameter = (records: IRecords): string => {
+  generateRecordsParameter = (records: Records): string => {
     const recordParams = this.compressRecords(records);
     return `records=${recordParams}`;
   };
 
-  compressRecords = (records: IRecords): string => {
+  compressRecords = (records: Records): string => {
     const visitedSubdivisionCodes = Object.keys(records).filter(subdivisionCode => {
       return subdivisionCode.length !== 2 && records[subdivisionCode] === 1;
     });
@@ -295,7 +295,7 @@ class Map extends React.Component<OuterProps, AppState> {
     </WorldSelectorWrapper>
   );
 
-  PrimaryRegionSelector = (props: primaryRegionSelectorProps) => {
+  PrimaryRegionSelector = (props: PrimaryRegionSelectorProps) => {
     const { primaryRegionCode } = props;
     return (
       <PrimaryRegionSelectorWrapper onClick={() => this.onClickPrimaryRegionHandler(primaryRegionCode)}>
@@ -520,13 +520,13 @@ const AreaSelectorButton = styled.div`
 
 const WorldSelectorWrapper = styled(AreaSelectorButton)`
   background-color: #edbccc;
-  border: 1px solid #ddacbc
+  border: 1px solid #ddacbc;
   text-align: center;
 `;
 
 const PrimaryRegionSelectorWrapper = styled(AreaSelectorButton)`
   background-color: #edcccc;
-  border: 1px solid #ddbcbc
+  border: 1px solid #ddbcbc;
   text-align: center;
 `;
 
@@ -576,21 +576,17 @@ const Link = styled.a`
   display: inline;
   font-family: arial, sans-serif;
   font-size: 14px;
-  height: auto;
   line-height: 30px;
-  margin-bottom: 0px;
   margin-left: 0px;
   margin-right: 0px;
-  margin-top: 0px;
   text-decoration-color: rgb(95, 99, 104);
   text-decoration-line: none;
   text-decoration-style: solid;
   visibility: visible;
   white-space: nowrap;
-  width: auto;
 `;
 
-interface primaryRegionSelectorProps {
+interface PrimaryRegionSelectorProps {
   primaryRegionCode: string;
 }
 
