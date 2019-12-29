@@ -11,19 +11,22 @@ import regions from './data/regions';
 
 const AREA_CODE_WORLD = 'world';
 
+type Records = {
+  [key: string]: number;
+};
+
+type GoogleChartsHeader = [string, string, {role: string, p: {html: boolean}}]
+type GoogleChartsData = GoogleChartsHeader | [string, number, string];
+
 interface OuterProps {
   location: H.Location;
-}
-
-interface Records {
-  [key: string]: number;
 }
 
 interface AppState {
   displayingAreaCode: string;
   resolution: string;
   records: Records;
-  lastGoogleChartsData: Array<any>;
+  lastGoogleChartsData: GoogleChartsData[];
   selectedPrimaryRegionCode: string;
   selectedSecondaryRegionCode: string;
   selectedCountryCode: string;
@@ -90,8 +93,8 @@ class Map extends React.Component<OuterProps, AppState> {
     this.setState({ lastGoogleChartsData: googleChartsData });
   };
 
-  translateGoogleChartsData = (records: Records): Array<any> => {
-    const googleChartsDataNoHeader = Object.entries(records).map(record => {
+  translateGoogleChartsData = (records: Records): GoogleChartsData[] => {
+    const googleChartsDataNoHeader: GoogleChartsData[] = Object.entries(records).map(record => {
       const { displayingAreaCode } = this.state;
       const areaCode = record[0];
       const areaScore = record[1];
@@ -107,16 +110,16 @@ class Map extends React.Component<OuterProps, AppState> {
         const check = areaScore ? '☑️' : '⬛️';
         append = check;
       }
-      return [...record, `${displayAreaName} ${append}`];
+      return [areaCode, areaScore, `${displayAreaName} ${append}`];
     });
-    const googleChartsData = [
+    const googleChartsData: GoogleChartsData[] = [
       ['Country', 'Value', { role: 'tooltip', p: { html: true } }],
       ...googleChartsDataNoHeader,
     ];
     return googleChartsData;
   };
 
-  getParametersLastRecords = (): Records | null => {
+  getParametersLastRecords = () => {
     const getParams = queryString.parse(this.props.location.search);
     if (!getParams.records || getParams.records instanceof Array) {
       return null;
@@ -181,8 +184,9 @@ class Map extends React.Component<OuterProps, AppState> {
     });
     // {countryCode: [subdivisionCode]}のフォーマットに
     // subdivisionCodeからはcountryCodeを除く
-    const changedFormatBase: { [index: string]: any } = {};
-    const changedFormat = visitedSubdivisionCodes.reduce((o: { [key: string]: Array<string> }, subdivisionCode) => {
+    type UrlRecordData = { [index: string]: string[] };
+    const changedFormatBase: UrlRecordData = {};
+    const changedFormat = visitedSubdivisionCodes.reduce((o: { [key: string]: string[] }, subdivisionCode) => {
       const splitedSubdivisionCode = subdivisionCode.split('-');
       const countryCode = splitedSubdivisionCode[0];
       const existed = countryCode in o ? o[countryCode] : [];
