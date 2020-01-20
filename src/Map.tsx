@@ -5,9 +5,11 @@ import Chart from 'react-google-charts';
 import styled from 'styled-components';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
-import countries from './data/countries';
-import relations from './data/relations';
-import regions from './data/regions';
+import countries from '@/data/countries';
+import relations from '@/data/relations';
+import regions from '@/data/regions';
+
+import Link from '@/components/atoms/Link'
 
 const AREA_CODE_WORLD = 'world';
 
@@ -572,22 +574,6 @@ const LinkBox = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-`;
-
-const Link = styled.a`
-  color: rgb(95, 99, 104);
-  cursor: pointer;
-  display: inline;
-  font-family: arial, sans-serif;
-  font-size: 14px;
-  line-height: 30px;
-  margin-left: 0px;
-  margin-right: 0px;
-  text-decoration-color: rgb(95, 99, 104);
-  text-decoration-line: none;
-  text-decoration-style: solid;
-  visibility: visible;
-  white-space: nowrap;
 `;
 
 interface PrimaryRegionSelectorProps {

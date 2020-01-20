@@ -48,10 +48,10 @@
     "react": {
       "version": "detect"
     },
-    "import/ignore": ["node_modules"],
+    "import/ignore": ["node_modules", "src/"],
     "import/resolver": {
       "node": { "moduleDirectory": ["node_modules", "src/"] },
-      "webpack": { "config": "config/webpack.config.js" }
+      "webpack": { "config": "webpack.config.ts" }
     }
   }
 }
