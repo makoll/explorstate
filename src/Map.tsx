@@ -9,7 +9,7 @@ import countries from '@/data/countries';
 import relations from '@/data/relations';
 import regions from '@/data/regions';
 
-import Link from '@/components/atoms/Link'
+import LinkBox from '@/components/organisms/LinkBox'
 
 const AREA_CODE_WORLD = 'world';
 
@@ -488,17 +488,7 @@ class Map extends React.Component<OuterProps, AppState> {
             options={options}
             data={googleChartsData}
           />
-          <LinkBox>
-            <Link href='about.html' target='_blank'>
-              About
-            </Link>
-            <Link href='https://github.com/makoll' target='_blank'>
-              Contact
-            </Link>
-            <Link href='https://github.com/makoll/explorstate' target='_blank'>
-              Github
-            </Link>
-          </LinkBox>
+          <LinkBox/>
         </MapContainer>
       </TopContainer>
     );
@@ -567,13 +557,6 @@ const AreaCheck = styled.span`
 
 const AreaScore = styled.span`
   float: right;
-`;
-
-const LinkBox = styled.div`
-  height: 30px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
 `;
 
 interface PrimaryRegionSelectorProps {
