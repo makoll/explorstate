@@ -8,6 +8,7 @@ import countries from '@/data/countries';
 import relations from '@/data/relations';
 import regions from '@/data/regions';
 
+import Logo from '@/components/atoms/Logo'
 import UrlCopy from '@/components/atoms/UrlCopy'
 import LinkBox from '@/components/organisms/LinkBox'
 import MapView from '@/components/organisms/MapView'
@@ -457,7 +458,7 @@ class Map extends React.Component<OuterProps, AppState> {
     return (
       <TopContainer>
         <ControllerContainer>
-          <img src='img/logo.png' alt='Logo' />
+          <Logo/>
           <UrlCopy recordsParameter={recordsParameter} />
           <AreaListContainer>
             <this.WorldSelector />
