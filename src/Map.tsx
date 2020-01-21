@@ -1,6 +1,6 @@
-import * as React from 'react';
-import * as queryString from 'query-string';
-import * as H from 'history';
+import React from 'react';
+import queryString from 'query-string';
+import H from 'history';
 import styled from 'styled-components';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
