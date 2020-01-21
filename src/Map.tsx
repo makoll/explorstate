@@ -8,6 +8,7 @@ import countries from '@/data/countries';
 import relations from '@/data/relations';
 import regions from '@/data/regions';
 
+import UrlCopy from '@/components/atoms/UrlCopy'
 import LinkBox from '@/components/organisms/LinkBox'
 import MapView from '@/components/organisms/MapView'
 
@@ -457,7 +458,7 @@ class Map extends React.Component<OuterProps, AppState> {
       <TopContainer>
         <ControllerContainer>
           <img src='img/logo.png' alt='Logo' />
-          <UrlCopy type='text' value={url} readOnly />
+          <UrlCopy recordsParameter={recordsParameter} />
           <AreaListContainer>
             <this.WorldSelector />
             <this.PrimaryRegionSelectorList />
@@ -530,10 +531,6 @@ const SubdivisionSelectorWrapper = styled(AreaSelectorButton)`
 const SubdivisionSelectorListWrapper = styled.div`
   height: ${window.innerHeight - 90}px;
   overflow: scroll;
-`;
-
-const UrlCopy = styled.input`
-  width: 296px;
 `;
 
 const AreaCheck = styled.span`
