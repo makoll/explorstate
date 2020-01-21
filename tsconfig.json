@@ -5,6 +5,7 @@
       "@/*": ["src/*"]
     },
     "target": "es5",
+    "esModuleInterop": true,
     "strict": true,
     "module": "commonjs",
     "jsx": "react",

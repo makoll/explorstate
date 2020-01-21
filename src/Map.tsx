@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as queryString from 'query-string';
 import * as H from 'history';
-import Chart from 'react-google-charts';
 import styled from 'styled-components';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
@@ -10,6 +9,7 @@ import relations from '@/data/relations';
 import regions from '@/data/regions';
 
 import LinkBox from '@/components/organisms/LinkBox'
+import MapView from '@/components/organisms/MapView'
 
 const AREA_CODE_WORLD = 'world';
 
@@ -17,8 +17,8 @@ type Records = {
   [key: string]: number;
 };
 
-type GoogleChartsHeader = [string, string, {role: string, p: {html: boolean}}]
-type GoogleChartsData = GoogleChartsHeader | [string, number, string];
+export type GoogleChartsHeader = [string, string, {role: string, p: {html: boolean}}]
+export type GoogleChartsData = GoogleChartsHeader | [string, number, string];
 
 interface OuterProps {
   location: H.Location;
@@ -450,14 +450,6 @@ class Map extends React.Component<OuterProps, AppState> {
 
     const googleChartsData = this.translateGoogleChartsData(records);
 
-    const options = {
-      region: displayingAreaCode,
-      resolution,
-      legend: 'none',
-      colorAxis: { colors: ['white', '#DBFFDB', '#CCEDD2', '#CCEDCC', '#BEEDBE'] },
-      backgroundColor: '#90C0E0',
-    };
-
     const recordsParameter = this.generateRecordsParameter(records);
     const url = `${document.domain}?${recordsParameter}`;
 
@@ -475,17 +467,10 @@ class Map extends React.Component<OuterProps, AppState> {
           </AreaListContainer>
         </ControllerContainer>
         <MapContainer>
-          <Chart
-            chartEvents={[
-              {
-                eventName: 'select',
-                callback: this.selectAreaOnMapHandler,
-              },
-            ]}
-            chartType='GeoChart'
-            height={`${window.innerHeight - 30}px`}
-            width={`${window.innerWidth - 300}px`}
-            options={options}
+          <MapView
+            region={displayingAreaCode}
+            resolution={resolution}
+            onSelect={this.selectAreaOnMapHandler}
             data={googleChartsData}
           />
           <LinkBox/>
