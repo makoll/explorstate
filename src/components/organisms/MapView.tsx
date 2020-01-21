@@ -1,7 +1,7 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 
-import { GoogleChartsData } from '@/Map'
+import { GoogleChartsData } from '@/Map';
 
 type Props = {
   region: string;
@@ -10,8 +10,7 @@ type Props = {
   onSelect: (chartWrapper: any) => void;
 };
 
-export const MapView: React.FC<Props> = ({ region, resolution, data, onSelect }) => {
-
+const MapView: React.FC<Props> = ({ region, resolution, data, onSelect }) => {
   const options = {
     region,
     resolution,
@@ -21,20 +20,20 @@ export const MapView: React.FC<Props> = ({ region, resolution, data, onSelect })
   };
 
   return (
-      <Chart
-        chartEvents={[
-          {
-            eventName: 'select',
-            callback: onSelect,
-          },
-        ]}
-        chartType='GeoChart'
-        height={`${window.innerHeight - 30}px`}
-        width={`${window.innerWidth - 300}px`}
-        options={options}
-        data={data}
-      />
+    <Chart
+      chartEvents={[
+        {
+          eventName: 'select',
+          callback: onSelect,
+        },
+      ]}
+      chartType='GeoChart'
+      height={`${window.innerHeight - 30}px`}
+      width={`${window.innerWidth - 300}px`}
+      options={options}
+      data={data}
+    />
   );
-}
+};
 
 export default MapView;

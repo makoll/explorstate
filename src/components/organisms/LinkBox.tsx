@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Link from '@/components/atoms/Link'
+import Link from '@/components/atoms/Link';
 
-export const LinkBox: React.FC = () => {
+const LinkBox: React.FC = () => {
   return (
     <Wrapper>
       <Link href='about.html' target='_blank'>
@@ -17,7 +17,7 @@ export const LinkBox: React.FC = () => {
       </Link>
     </Wrapper>
   );
-}
+};
 
 const Wrapper = styled.div`
   height: 30px;

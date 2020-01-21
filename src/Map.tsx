@@ -7,11 +7,11 @@ import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from
 import countries from '@/data/countries';
 import relations from '@/data/relations';
 import regions from '@/data/regions';
-
-import Logo from '@/components/atoms/Logo'
-import UrlCopy from '@/components/atoms/UrlCopy'
-import LinkBox from '@/components/organisms/LinkBox'
-import MapView from '@/components/organisms/MapView'
+import Logo from '@/components/atoms/Logo';
+import UrlCopy from '@/components/atoms/UrlCopy';
+import LinkBox from '@/components/organisms/LinkBox';
+import MapView from '@/components/organisms/MapView';
+import WorldSelector from '@/components/organisms/WorldSelector';
 
 const AREA_CODE_WORLD = 'world';
 
@@ -19,7 +19,7 @@ type Records = {
   [key: string]: number;
 };
 
-export type GoogleChartsHeader = [string, string, {role: string, p: {html: boolean}}]
+export type GoogleChartsHeader = [string, string, { role: string; p: { html: boolean } }];
 export type GoogleChartsData = GoogleChartsHeader | [string, number, string];
 
 interface OuterProps {
@@ -297,12 +297,6 @@ class Map extends React.Component<OuterProps, AppState> {
     this.setState({ records });
   };
 
-  WorldSelector = () => (
-    <WorldSelectorWrapper onClick={this.goToWorldHandler}>
-      <div>WORLD</div>
-    </WorldSelectorWrapper>
-  );
-
   PrimaryRegionSelector = (props: PrimaryRegionSelectorProps) => {
     const { primaryRegionCode } = props;
     return (
@@ -453,15 +447,14 @@ class Map extends React.Component<OuterProps, AppState> {
     const googleChartsData = this.translateGoogleChartsData(records);
 
     const recordsParameter = this.generateRecordsParameter(records);
-    const url = `${document.domain}?${recordsParameter}`;
 
     return (
       <TopContainer>
         <ControllerContainer>
-          <Logo/>
+          <Logo />
           <UrlCopy recordsParameter={recordsParameter} />
           <AreaListContainer>
-            <this.WorldSelector />
+            <WorldSelector onClick={this.goToWorldHandler} />
             <this.PrimaryRegionSelectorList />
             <this.SecondaryRegionSelectorList />
             <this.CountrySelectorList />
@@ -475,7 +468,7 @@ class Map extends React.Component<OuterProps, AppState> {
             onSelect={this.selectAreaOnMapHandler}
             data={googleChartsData}
           />
-          <LinkBox/>
+          <LinkBox />
         </MapContainer>
       </TopContainer>
     );
@@ -492,19 +485,13 @@ const ControllerContainer = styled.div``;
 
 const AreaListContainer = styled.div``;
 
-const AreaSelectorButton = styled.div`
+export const AreaSelectorButton = styled.div`
   width: 300px;
   cursor: pointer;
 
   &:hover {
     font-weight: bold;
   }
-`;
-
-const WorldSelectorWrapper = styled(AreaSelectorButton)`
-  background-color: #edbccc;
-  border: 1px solid #ddacbc;
-  text-align: center;
 `;
 
 const PrimaryRegionSelectorWrapper = styled(AreaSelectorButton)`

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Link = styled.a`
+const Link = styled.a`
   color: rgb(95, 99, 104);
   cursor: pointer;
   display: inline;
