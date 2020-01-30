@@ -447,7 +447,7 @@ class Top extends React.Component<OuterProps, AppState> {
     const recordsParameter = this.generateRecordsParameter(records);
 
     return (
-      <TopContainer>
+      <Wrapper>
         <ControllerContainer>
           <Logo />
           <UrlCopy recordsParameter={recordsParameter} />
@@ -468,12 +468,12 @@ class Top extends React.Component<OuterProps, AppState> {
           />
           <LinkBox />
         </MapContainer>
-      </TopContainer>
+      </Wrapper>
     );
   }
 }
 
-const TopContainer = styled.div`
+const Wrapper = styled.div`
   display: flex;
 `;
 
