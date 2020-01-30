@@ -1,7 +1,7 @@
 import React from 'react';
 import Chart from 'react-google-charts';
 
-import { GoogleChartsData } from '@/components/pages/Top';
+import { GoogleChartsData } from '@/types/GoogleChartsData';
 
 type Props = {
   region: string;

@@ -12,15 +12,13 @@ import UrlCopy from '@/components/atoms/UrlCopy';
 import LinkBox from '@/components/organisms/LinkBox';
 import MapView from '@/components/organisms/MapView';
 import WorldSelector from '@/components/organisms/WorldSelector';
+import { GoogleChartsData } from '@/types/GoogleChartsData';
 
 const AREA_CODE_WORLD = 'world';
 
 type Records = {
   [key: string]: number;
 };
-
-export type GoogleChartsHeader = [string, string, { role: string; p: { html: boolean } }];
-export type GoogleChartsData = GoogleChartsHeader | [string, number, string];
 
 interface OuterProps {
   location: H.Location;
