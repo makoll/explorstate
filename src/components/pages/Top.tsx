@@ -43,7 +43,7 @@ const getInitRecords = (): Records => {
   return records;
 };
 
-class Map extends React.Component<OuterProps, AppState> {
+class Top extends React.Component<OuterProps, AppState> {
   constructor(props: OuterProps) {
     super(props);
     const records: Records = Object.assign(getInitRecords(), this.getParametersLastRecords());
@@ -547,4 +547,4 @@ interface SubdivisionSelectorProps {
   subdivisionNameSub: string;
 }
 
-export default Map;
+export default Top;

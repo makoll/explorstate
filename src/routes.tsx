@@ -3,7 +3,7 @@ import ReactGA from 'react-ga';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { Reset } from 'styled-reset';
 
-import Map from '@/Map';
+import Top from '@/components/pages/Top';
 
 const Routes: React.FC = () => {
   // Mount時
@@ -18,7 +18,7 @@ const Routes: React.FC = () => {
       <Reset />
       <BrowserRouter>
         <>
-          <Route exact path='/' component={Map} />
+          <Route exact path='/' component={Top} />
         </>
       </BrowserRouter>
     </React.Fragment>
