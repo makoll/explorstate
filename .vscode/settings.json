@@ -1,14 +1,16 @@
 {
-  "editor.rulers": [120],
-  "files.trimTrailingWhitespace": true,
-  "editor.renderWhitespace": "all",
   "css.lint.ieHack": "warning",
-  "javascript.implicitProjectConfig.checkJs": true,
-  "typescript.updateImportsOnFileMove.enabled": "always",
   "editor.codeActionsOnSave": {
-    "editor.formatOnSave": true,
+    "source.fixAll.eslint": true,
   },
-  "eslint.packageManager": "yarn",
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "stylelint.enable": true
+  "editor.renderWhitespace": "all",
+  "editor.rulers": [120],
+  "eslint.alwaysShowStatus": true,
+  "eslint.enable": true,
+  "eslint.packageManager": "yarn",
+  "files.trimTrailingWhitespace": true,
+  "javascript.implicitProjectConfig.checkJs": true,
+  "stylelint.enable": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
 }
