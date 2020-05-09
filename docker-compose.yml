@@ -3,7 +3,7 @@ services:
   spa:
     build:
       context: .
-      target: builder
+      dockerfile: ./Dockerfile
     command: /bin/sh -c "yarn && yarn run start"
     ports:
       - "80:8080"
