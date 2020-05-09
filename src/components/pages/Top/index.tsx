@@ -132,7 +132,7 @@ class Top extends React.Component<OuterProps, AppState> {
   };
 
   decompressRecords = (compressed: string): Records => {
-    const recordsString = decompressFromEncodedURIComponent(compressed);
+    const recordsString = decompressFromEncodedURIComponent(compressed) || '';
     const countryDataArray = recordsString.split(';');
     const records = countryDataArray.reduce((o: Records, c) => {
       const splittedCompnayAndSubdivision = c.split(':');
