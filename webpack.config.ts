@@ -3,6 +3,7 @@ import path from 'path';
 import { Configuration } from 'webpack';
 
 const config: Configuration = {
+  devtool: 'inline-source-map',
   context: path.join(__dirname, 'src'),
   entry: './index.tsx',
   output: {
