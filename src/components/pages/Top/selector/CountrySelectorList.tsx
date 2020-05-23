@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import AreaButton from '@/components/atoms/AreaButton';
 import AreaCheck from '@/components/atoms/AreaCheck';
 import countries from '@/data/countries';
+import flags from '@/data/flags';
 import relations from '@/data/relations';
 import { ActionType, AppContext } from '@/components/pages/Top';
 
@@ -37,6 +38,7 @@ const CountrySelector: React.FC<{ countryCode: string }> = ({ countryCode }) => 
   const countryName = countries[countryCode][0];
   const countryNameSub = countries[countryCode][1];
   const countriesArray = Object.entries(countries);
+  const flag = flags[countryCode];
 
   const subdivisions = countriesArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
   let areaPrefix;
@@ -58,9 +60,9 @@ const CountrySelector: React.FC<{ countryCode: string }> = ({ countryCode }) => 
   return (
     <CountrySelectorWrapper onClick={onClickCountryHandler}>
       <span>
+        {flag}
         {countryName} ({countryNameSub})
       </span>
-      {areaPrefix}
     </CountrySelectorWrapper>
   );
 };
