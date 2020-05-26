@@ -11,6 +11,10 @@ export const generateInitRecords = (): Records => {
   return records;
 };
 
+export const generateSecondaryRegionMap = () => {
+  return Object.values(relations).reduce((obj, next) => Object.assign(obj, next), {});
+};
+
 export const generateSecondaryRegionPrimaryRegionMap = () => {
   const secondaryRegionPrimaryRegionMap = Object.keys(relations).reduce((o1, primaryRegion) => {
     return Object.keys(relations[primaryRegion]).reduce((o2, secondaryRegion) => {
@@ -50,6 +54,14 @@ export const getParametersRecords = () => {
   const paramsRecords: string = getParams.records;
   const records = decompressRecords(paramsRecords);
   return records;
+};
+
+export const getParametersAreaCode = () => {
+  const getParams = queryString.parse(location.search);
+  if ('string' !== typeof getParams.area_code) {
+    return;
+  }
+  return getParams.area_code;
 };
 
 export const translateGoogleChartsData = (displayingAreaCode: string, records: Records): GoogleChartsData[] => {

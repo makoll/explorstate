@@ -1,4 +1,4 @@
-import React, { Reducer, createContext, useReducer } from 'react';
+import React, { Reducer, createContext, useEffect, useReducer } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -6,6 +6,7 @@ import {
   generateCountrySecondaryRegionMap,
   generateInitRecords,
   generateSecondaryRegionPrimaryRegionMap,
+  getParametersAreaCode,
   getParametersRecords,
   translateGoogleChartsData,
 } from './data/Generator';
@@ -21,6 +22,7 @@ import WorldSelector from '@/components/pages/Top/selector/WorldSelector';
 import UrlCopy from '@/components/pages/Top/UrlCopy';
 import { GoogleChartsData } from '@/types/GoogleChartsData';
 import { Records } from '@/types/Records';
+import { isCountryCode, isPrimaryRegionCode, isSecondaryRegionCode } from '@/types/AreaCode';
 
 export const AREA_CODE_WORLD = 'world';
 
@@ -115,6 +117,8 @@ const reducer = (state: State, action: Actions) => {
     }
     case ActionType.CHOICE_SECONDARY_REGION: {
       const { secondaryRegionCode } = action.payload;
+      const { secondaryRegionPrimaryRegionMap } = state;
+      const selectedPrimaryRegionCode = secondaryRegionPrimaryRegionMap[secondaryRegionCode];
 
       // 表示中のSecondaryRegionを再度選択した場合
       // PrimaryRegionに移動 (上のページに戻るイメージ)
@@ -123,6 +127,7 @@ const reducer = (state: State, action: Actions) => {
           ...state,
           displayingAreaCode: state.selectedPrimaryRegionCode,
           resolution: '',
+          selectedPrimaryRegionCode,
           selectedSecondaryRegionCode: '',
           selectedCountryCode: '',
         };
@@ -132,6 +137,7 @@ const reducer = (state: State, action: Actions) => {
         ...state,
         displayingAreaCode: secondaryRegionCode,
         resolution: '',
+        selectedPrimaryRegionCode,
         selectedSecondaryRegionCode: secondaryRegionCode,
         selectedCountryCode: '',
       };
@@ -220,6 +226,29 @@ const Top: React.FC = () => {
     countrySecondaryRegionMap,
   };
   const [state, dispatch] = useReducer<Reducer<State, Actions>>(reducer, initialState);
+
+  const displayingAreaCode = getParametersAreaCode();
+
+  useEffect(() => {
+    if (isPrimaryRegionCode(displayingAreaCode)) {
+      dispatch({
+        type: ActionType.CHOICE_PRIMARY_REGION,
+        payload: { primaryRegionCode: displayingAreaCode },
+      });
+    }
+    if (isSecondaryRegionCode(displayingAreaCode)) {
+      dispatch({
+        type: ActionType.CHOICE_SECONDARY_REGION,
+        payload: { secondaryRegionCode: displayingAreaCode },
+      });
+    }
+    if (isCountryCode(displayingAreaCode)) {
+      dispatch({
+        type: ActionType.CHOICE_COUNTRY,
+        payload: { countryCode: displayingAreaCode },
+      });
+    }
+  }, [displayingAreaCode]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
