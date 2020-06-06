@@ -41,13 +41,13 @@ const CountrySelector: React.FC<{ countryCode: string }> = ({ countryCode }) => 
   const flag = flags[countryCode];
 
   const subdivisions = countriesArray.filter(areaData => areaData[0].startsWith(`${countryCode}-`));
-  let areaPrefix;
+  let countrySuffix;
   if (0 === subdivisions.length) {
     const isCheck = Boolean(records[countryCode]);
-    areaPrefix = <AreaCheck isCheck={isCheck} />;
+    countrySuffix = <AreaCheck isCheck={isCheck} />;
   } else {
     const score: number = Math.round(records[countryCode] * 1000) / 10;
-    areaPrefix = <AreaScore score={score} />;
+    countrySuffix = <AreaScore score={score} />;
   }
 
   const onClickCountryHandler = () => {
@@ -61,7 +61,7 @@ const CountrySelector: React.FC<{ countryCode: string }> = ({ countryCode }) => 
     <CountrySelectorWrapper onClick={onClickCountryHandler}>
       <span>
         {flag}
-        {countryName} ({countryNameSub})
+        {countryName} ({countryNameSub}) {countrySuffix}
       </span>
     </CountrySelectorWrapper>
   );
