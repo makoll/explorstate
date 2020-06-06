@@ -1,4 +1,6 @@
 const countries: { [key: string]: Array<string> } = {
+  // ダミー用エリア
+  AA: ['default', 'default'],
   AD: ['Andorra', 'アンドラ'],
   'AD-02': ['Canillo'],
   'AD-03': ['Encamp'],
