@@ -8,8 +8,6 @@ import { Records, compressRecords, decompressRecords } from '@/types/Records';
 
 export const generateInitRecords = (): Records => {
   const records: Records = Object.keys(countries).reduce((obj, areaCode) => Object.assign(obj, { [areaCode]: 0 }), {});
-  // 全てのエリアが0だと、デフォルトの緑色で地図が塗りつぶされるためダミーエリアのAAに1を入れる
-  records['AA'] = 1;
   return records;
 };
 
@@ -55,7 +53,6 @@ export const getParametersRecords = () => {
   }
   const paramsRecords: string = getParams.records;
   const records = decompressRecords(paramsRecords);
-  console.log(records);
   return records;
 };
 

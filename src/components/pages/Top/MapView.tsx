@@ -36,7 +36,11 @@ const MapView: React.FC = () => {
     region: displayingAreaCode,
     resolution,
     legend: 'none',
-    colorAxis: { colors: ['white', '#DBFFDB', '#CCEDD2', '#CCEDCC', '#BEEDBE'] },
+    colorAxis: {
+      maxValue: 1,
+      minValue: 0,
+      colors: ['white', '#DBFFDB', '#CCEDD2', '#CCEDCC', '#BEEDBE'],
+    },
     backgroundColor: '#90C0E0',
   };
 
